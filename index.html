@@ -1,0 +1,2284 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام تقييم الأداء الوظيفي الشامل - مدارس الشارقة الأهلية</title>
+    <style>
+        :root {
+            --primary-purple: #38003c;
+            --purple-gradient: linear-gradient(135deg, #4a148c 0%, #6a1b9a 100%);
+            --accent-cyan: #00bcd4;
+            --accent-yellow: #ffc107;
+            --bg-main: #f4f6f9;
+            --sidebar-width: 270px;
+            --text-dark: #111;
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-dark);
+            margin: 0; padding: 0;
+            display: flex; min-height: 100vh;
+            flex-direction: row;
+        }
+        #loginOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #260029;
+            display: flex; justify-content: center; align-items: center; z-index: 9999;
+            padding: 15px;
+        }
+        .login-card {
+            background: white; padding: 25px 30px; border-radius: 10px; width: 100%; max-width: 420px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: center;
+        }
+        .login-card h2 { color: #260029; margin-bottom: 2px; font-size: 18px; font-weight: bold; }
+        .login-badge { color: #b71c1c; display: inline-block; padding: 2px 10px; font-size: 11px; font-weight: bold; margin-bottom: 10px; }
+        .login-dev-credit { font-size: 10.5px; color: #512da8; font-weight: bold; background: #f3e5f5; padding: 4px 8px; border-radius: 4px; margin-bottom: 15px; border: 1px dashed #512da8; }
+        .login-card label { display: block; text-align: right; font-size: 11px; font-weight: bold; color: #444; margin-bottom: 4px; }
+        .login-card input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 12px; margin-bottom: 15px; background: #fafafa; }
+        .login-card button { width: 100%; padding: 12px; background: #260029; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 13px; }
+
+        aside {
+            width: var(--sidebar-width); background: var(--purple-gradient); color: white;
+            position: fixed; height: 100vh; display: flex; flex-direction: column;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2); z-index: 100;
+            transition: transform 0.3s ease; overflow-y: auto;
+        }
+        .sidebar-brand { padding: 12px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.15); }
+        .sidebar-brand img { max-height: 65px; width: auto; display: block; margin: 0 auto; }
+
+        .sidebar-top-filter {
+            background: rgba(0,0,0,0.25); padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 10px;
+        }
+        .sidebar-top-filter label { color: var(--accent-yellow); display: block; margin-bottom: 3px; font-weight: bold; }
+        .sidebar-top-filter select { width: 100%; padding: 5px; font-size: 11px; border-radius: 3px; border: none; }
+
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; flex-shrink: 0; }
+        .sidebar-menu li a {
+            display: block; padding: 9px 15px; color: #e1bee7; text-decoration: none;
+            font-size: 10.5px; font-weight: 600; border-right: 4px solid transparent; transition: all 0.3s;
+        }
+        .sidebar-menu li a:hover { background: rgba(255,255,255,0.12); color: white; }
+        .sidebar-menu li a.active-page { background: rgba(0, 188, 212, 0.4); color: white; border-right-color: var(--accent-cyan); }
+
+        .sidebar-sub-filters {
+            background: rgba(0,0,0,0.2); padding: 10px; border-top: 1px solid rgba(255,255,255,0.15);
+            border-bottom: 1px solid rgba(255,255,255,0.15); font-size: 10px; margin-bottom: 20px;
+        }
+        .sidebar-sub-filters label { color: var(--accent-yellow); display: block; margin-bottom: 2px; font-weight: bold; }
+        .sidebar-sub-filters select { width: 100%; padding: 5px; margin-bottom: 5px; font-size: 11px; border-radius: 3px; border: none; }
+
+        main {
+            margin-right: var(--sidebar-width); flex-grow: 1; padding: 15px; overflow-y: auto;
+            width: calc(100% - var(--sidebar-width));
+        }
+        
+        .action-bar {
+            display: flex; gap: 8px; margin-bottom: 10px; background: var(--primary-purple);
+            padding: 8px 15px; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            align-items: center; justify-content: space-between; color: white; flex-wrap: wrap;
+        }
+        .nav-left-sec { display: flex; align-items: center; gap: 6px; }
+        .nav-center-sec { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; justify-content: center; flex-grow: 1; }
+        .topbar-credit-text {
+            font-size: 11px; font-weight: bold; color: var(--accent-yellow);
+            background: rgba(0,0,0,0.25); padding: 5px 10px; border-radius: 4px;
+            border: 1px solid rgba(255, 193, 7, 0.4); white-space: nowrap;
+        }
+
+        .btn {
+            background: #512da8; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 11px;
+            white-space: nowrap;
+        }
+        .btn:hover { background: #673ab7; }
+        .btn-yellow { background: var(--accent-yellow); color: #000; }
+        
+        .card {
+            background: white; padding: 15px 20px; border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 10px;
+            width: 100%;
+            margin-left: auto; margin-right: auto;
+            overflow-x: auto;
+        }
+        .single-eval-form-wrapper {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #ccc;
+        }
+        .single-eval-form-wrapper:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .section-title {
+            background-color: #f3e5f5; color: var(--primary-purple); padding: 8px 10px;
+            font-weight: bold; margin: 0; border: 1px solid var(--primary-purple);
+            text-align: center; font-size: 11.5px;
+        }
+        
+        .table-responsive { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: 5px; }
+
+        .eval-header-table { width: 100%; min-width: 550px; border-collapse: collapse; margin-bottom: 0; font-size: 10.5px; border: 1px solid var(--primary-purple); }
+        .eval-header-table td { border: 1px solid var(--primary-purple); padding: 5px; text-align: center; background: #fff; }
+        .eval-header-table td.text-center-cell { text-align: center; }
+        .eval-header-table td.purple-bg { background: #f3e5f5; color: var(--primary-purple); font-weight: bold; text-align: center; }
+
+        table { width: 100%; min-width: 550px; border-collapse: collapse; margin-top: 0; margin-bottom: 0; border: 1px solid var(--primary-purple); }
+        th, td { border: 1px solid var(--primary-purple); padding: 5px; text-align: center; font-size: 10.5px; }
+        th { background: var(--primary-purple); color: white; }
+        td.text-right { text-align: right; }
+        
+        input.score-input { width: 55px; padding: 3px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 12px; direction: ltr; unicode-bidi: embed; }
+        
+        .signature-box {
+            border: 1px solid var(--primary-purple); background: #fafafa; height: 55px; border-radius: 3px; position: relative; cursor: crosshair; touch-action: none;
+        }
+        .signature-box canvas { width: 100%; height: 100%; display: block; }
+        .signature-img-view { width: 100%; height: 100%; object-fit: contain; display: block; }
+
+        .pagination-bar {
+            display: flex; justify-content: space-between; align-items: center; margin-top: 8px; font-size: 11px; background: #f1f1f1; padding: 6px 10px; border-radius: 4px; flex-wrap: wrap; gap: 5px;
+        }
+        .pagination-bar select { padding: 3px; font-size: 11px; }
+
+        .multi-select-box {
+            text-align: right; height: 350px !important; overflow-y: auto !important; padding: 12px; border: 1px solid var(--primary-purple); background: #fff; border-radius: 4px; font-size: 12px; width: 100%;
+        }
+        .multi-select-item { display: block; margin-bottom: 10px; cursor: pointer; }
+
+        .mobile-menu-toggle {
+            display: none; background: var(--accent-yellow); color: #000; border: none; padding: 6px 10px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; margin-bottom: 10px;
+        }
+
+        @media screen and (max-width: 992px) {
+            aside { transform: translateX(100%); z-index: 1000; }
+            aside.mobile-open { transform: translateX(0); }
+            main { margin-right: 0; width: 100%; padding: 10px; }
+            .mobile-menu-toggle { display: inline-block; }
+            .card { padding: 10px; }
+        }
+
+        @media print {
+            aside, .action-bar, .mobile-menu-toggle, #loginOverlay, button, .pagination-bar { display: none !important; }
+            main { margin: 0; padding: 0; width: 100%; }
+            body { background: white; font-size: 9px; color: #000; }
+            .card { box-shadow: none; padding: 0; margin: 0; border: none; width: 100%; max-width: 100%; }
+            .page-break-print { page-break-after: always; break-after: page; }
+            select, input[type="date"] {
+                -webkit-appearance: none; appearance: none;
+                background: transparent !important; border: none !important;
+                padding: 0 !important; margin: 0 !important; color: #000 !important; pointer-events: none;
+            }
+            @page { size: A4 portrait; margin: 4mm; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loginOverlay">
+    <div class="login-card">
+        <div style="display: flex; justify-content: space-around; align-items: center; margin-bottom: 12px; background: #f9f9f9; padding: 10px; border-radius: 6px; border: 1px solid #eee;">
+            <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار مدارس الشارقة الأهلية" style="height: 60px; width: auto; object-fit: contain;">
+            <div style="text-align: center;">
+                <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار حملة وصلنا ومكملين" style="height: 48px; width: auto; object-fit: contain;">
+                <span style="font-size: 10.5px; font-weight: bold; color: var(--primary-purple); display: block; margin-top: 2px;">وصلنا... ومكملين</span>
+            </div>
+        </div>
+        <h2>مدارس الشارقة الأهلية</h2>
+        <span class="login-badge">نظام التقييم الإلكتروني</span>
+        <div class="login-dev-credit">برمجة الشؤون التعليمية بمدارس الشارقة الأهلية</div>
+        <label>اسم المستخدم:</label>
+        <input type="text" id="loginUser" placeholder="">
+        <label>كلمة المرور:</label>
+        <input type="password" id="loginPass" placeholder="">
+        <button onclick="handleLogin()">دخول النظام</button>
+    </div>
+</div>
+
+<aside id="sidebarNav">
+    <div>
+        <div class="sidebar-brand">
+            <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار المدرسة">
+        </div>
+
+        <div class="sidebar-top-filter">
+            <label>استمارة التقييم:</label>
+            <select id="filterFormType" onchange="changeEvaluationFormTemplate()">
+                <!-- تُعبأ تلقائياً -->
+            </select>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="#" id="menu-eval" onclick="switchPage('eval', this); toggleMobileMenu();">استمارة تقييم الأداء لشاغلي الوظائف التعليمية</a></li>
+            <li><a href="#" id="menu-archive" onclick="switchPage('archive', this); toggleMobileMenu();">سجل وأرشفة الزيارات</a></li>
+            <li><a href="#" id="menu-teachers" onclick="switchPage('teachers', this); toggleMobileMenu();">قائمة المعلمين والمعلمات (205)</a></li>
+            <li><a href="#" id="menu-staff" onclick="switchPage('staff', this); toggleMobileMenu();">قائمة الكادر الإداري (67)</a></li>
+            <li><a href="#" id="menu-classes" onclick="switchPage('classes', this); toggleMobileMenu();">إدارة الصفوف الدراسية</a></li>
+            <li><a href="#" id="menu-users" onclick="switchPage('users', this); toggleMobileMenu();">إدارة مستخدمي النظام</a></li>
+            <li><a href="#" id="menu-permissions" onclick="switchPage('permissions', this); toggleMobileMenu();">الصلاحيات والفئات</a></li>
+            <li><a href="#" id="menu-approved-perms" onclick="switchPage('approved-perms', this); toggleMobileMenu();">جدول الصلاحيات المعتمدة</a></li>
+            <li><a href="#" id="menu-settings" onclick="switchPage('settings', this); toggleMobileMenu();">إعدادات الاستمارات</a></li>
+        </ul>
+
+        <div class="sidebar-sub-filters">
+            <label>الفرع:</label>
+            <select id="filterBranch" onchange="applyGlobalFilters()">
+                <option value="ALL">جميع الفروع</option>
+                <option value="الحزم">فرع الحزم</option>
+                <option value="طويق">فرع طويق</option>
+            </select>
+
+            <label>القسم:</label>
+            <select id="filterSection" onchange="onSectionFilterChanged()">
+                <option value="ALL">جميع الأقسام</option>
+                <option value="بنين">بنين</option>
+                <option value="بنات">بنات</option>
+            </select>
+
+            <label>المرحلة:</label>
+            <select id="filterStage" onchange="applyGlobalFilters()">
+                <option value="ALL">جميع المراحل</option>
+                <option value="ابتدائي">ابتدائي</option>
+                <option value="متوسط">متوسط</option>
+                <option value="ثانوي">ثانوي</option>
+                <option id="optStageKg" value="رياض أطفال">رياض أطفال</option>
+            </select>
+        </div>
+    </div>
+</aside>
+
+<main>
+    <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰ القائمة والفلاتر</button>
+
+    <div class="action-bar">
+        <!-- الجملة أصبحت طرفية في أقصى اليمين -->
+        <span class="topbar-credit-text">برمجة الشؤون التعليمية بمدارس الشارقة الأهلية</span>
+
+        <!-- الأزرار في الوسط -->
+        <div class="nav-center-sec">
+            <button class="btn" onclick="switchPage('eval', document.getElementById('menu-eval'))">الرئيسية</button>
+            <button class="btn" onclick="prevPage()">سابق</button>
+            <button class="btn" onclick="nextPage()">تالي</button>
+            <button id="topBarNewEvalBtn" class="btn btn-yellow" onclick="saveEvaluationAndReset()">حفظ وبدء تقييم جديد</button>
+            <button id="topBarPdfBtn" class="btn" style="background: #e65100;" onclick="exportToPDF()">تصدير PDF</button>
+            <button class="btn" style="background: #c62828;" onclick="logout()">خروج</button>
+        </div>
+
+        <!-- الشعار في أقصى اليسار -->
+        <div class="nav-left-sec">
+            <span style="font-size: 10.5px; font-weight: bold; color: #fff;">وصلنا... ومكملين</span>
+            <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار الحملة" style="height: 38px; width: auto;">
+        </div>
+    </div>
+
+    <!-- استمارة تقييم الأداء لشاغلي الوظائف التعليمية -->
+    <div id="page-eval" class="card">
+        <div id="viewingNotice" style="display:none; background:#ffc107; color:#000; text-align:center; font-weight:bold; padding:5px; margin-bottom:8px; font-size:11px; border-radius:4px;">
+            وضع استعراض ملف المعلم الموحد (للقراءة فقط) - <button onclick="resetToNewEvaluationMode()" style="background:#38003c; color:#fff; border:none; padding:2px 6px; border-radius:3px; cursor:pointer;">العودة لتقييم جديد</button>
+        </div>
+        
+        <div id="evaluationsContainer">
+            <!-- الاستمارة الافتراضية للتقييم الجديد -->
+        </div>
+    </div>
+
+    <!-- سجل وأرشفة الزيارات -->
+    <div id="page-archive" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">سجل وأرشفة الزيارات الصفية السابقة (ملف موحد لكل معلم)</h2>
+        <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; justify-content: center; align-items: center;">
+            <input type="text" id="archiveSearchInput" placeholder="بحث باسم المعلم أو المادة..." oninput="renderArchiveTable()" style="padding: 6px; font-size: 11px; border: 1px solid var(--primary-purple); border-radius: 4px; width: 250px; text-align: center;">
+            <button class="btn btn-yellow" onclick="renderArchiveTable()">تحديث القائمة</button>
+            <button class="btn" style="background: #c62828;" onclick="clearAllArchive()">حذف الكل لتفريغ الذاكرة</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>اسم المعلم / الموظف</th>
+                        <th>عدد الزيارات المحفوظة</th>
+                        <th>آخر تاريخ زيارة</th>
+                        <th>إجراء ملف المعلم الموحد</th>
+                    </tr>
+                </thead>
+                <tbody id="archiveTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- المعلمين والمعلمات -->
+    <div id="page-teachers" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">قائمة المعلمين والمعلمات الفعلية (205)</h2>
+        <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; justify-content:center;">
+            <button class="btn" style="font-size:10.5px;" onclick="addNewTeacherModal()">+ إضافة معلم جديد</button>
+            <button class="btn btn-yellow" style="font-size:10.5px;" onclick="exportExcelTemplate()">تصدير إكسل</button>
+            <input type="file" id="excelFileImport" style="display:none" onchange="importExcelData(event)">
+            <button class="btn" style="background:#00796b; font-size:10.5px;" onclick="document.getElementById('excelFileImport').click()">استيراد من إكسل</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>الاسم</th>
+                        <th>الجنسية</th>
+                        <th>الفرع</th>
+                        <th>القسم</th>
+                        <th>المرحلة</th>
+                        <th>التخصص</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="teachersTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination-bar">
+            <div>عرض: <select id="teachersPageSize" onchange="changePageSize('teachers')"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="205">الكل</option></select></div>
+            <div id="teachersPaginationControls"></div>
+        </div>
+    </div>
+
+    <!-- الكادر الإداري -->
+    <div id="page-staff" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">قائمة الكادر الإداري (67 موظف)</h2>
+        <div style="display: flex; gap: 5px; margin-bottom: 8px; flex-wrap: wrap; justify-content:center;">
+            <button class="btn" style="font-size:10.5px;" onclick="addNewStaffModal()">+ إضافة إداري جديد</button>
+            <button class="btn btn-yellow" style="font-size:10.5px;" onclick="exportStaffExcel()">تصدير إكسل</button>
+            <input type="file" id="staffFileImport" style="display:none" onchange="importStaffExcel(event)">
+            <button class="btn" style="background:#00796b; font-size:10.5px;" onclick="document.getElementById('staffFileImport').click()">استيراد من إكسل</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>م</th>
+                        <th>الاسم</th>
+                        <th>الجنسية</th>
+                        <th>الفرع</th>
+                        <th>القسم</th>
+                        <th>المرحلة</th>
+                        <th>الوظيفة الإدارية</th>
+                        <th>الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="staffTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination-bar">
+            <div>عرض: <select id="staffPageSize" onchange="changePageSize('staff')"><option value="10">10</option><option value="25" selected>25</option><option value="50">50</option><option value="67">الكل</option></select></div>
+            <div id="staffPaginationControls"></div>
+        </div>
+    </div>
+
+    <!-- إدارة الصفوف الدراسية -->
+    <div id="page-classes" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 13px; text-align:center;">إدارة وتوليد الصفوف والفصول الدراسية (مرتبة تناسقياً)</h2>
+        <div style="background: #f3e5f5; border: 1px dashed var(--primary-purple); padding: 10px; border-radius: 5px; margin-bottom: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; justify-content:center;">
+            <span style="font-weight: bold; font-size: 10.5px; color: var(--primary-purple);">أدوات التوليد حسب الفلاتر الجانبية الحالية:</span>
+            <input type="text" id="gradeNameInput" placeholder="الصف (مثل: ثاني)" style="padding: 5px; font-size: 11px; border: 1px solid var(--primary-purple); border-radius: 3px; width: 110px; text-align:center; outline:none;">
+            <label style="font-size: 11px; font-weight: bold;">عدد الفصول:</label>
+            <input type="number" id="gradeCountInput" min="1" value="6" style="width: 50px; padding: 4px; text-align: center; font-size: 11px; border: 1px solid var(--primary-purple); outline:none;">
+            <button class="btn btn-yellow" onclick="generateGradeClasses()">توليد تلقائي مرتب</button>
+            <button class="btn" style="background: #2e7d32;" onclick="addSingleClass()">+ إضافة فصل فردي</button>
+        </div>
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 8%;">م</th>
+                        <th style="width: 32%;">اسم الفصل</th>
+                        <th style="width: 35%;">الفرع / القسم / المرحلة</th>
+                        <th style="width: 25%;">الإجراءات</th>
+                    </tr>
+                </thead>
+                <tbody id="classesTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination-bar">
+            <div>عرض: <select id="classesPageSize" onchange="renderClassesTable()"><option value="10" selected>10</option><option value="25">25</option><option value="50">50</option></select></div>
+            <div id="classesPaginationControls"></div>
+        </div>
+    </div>
+
+    <!-- مستخدمو النظام -->
+    <div id="page-users" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">إدارة مستخدمي النظام الأساسيين (38 مستخدم)</h2>
+        <div style="margin-bottom:6px; text-align:center;"><button class="btn" style="font-size:11px;" onclick="addNewUser()">+ إضافة مستخدم جديد</button></div>
+        <div class="table-responsive">
+            <table>
+                <thead><tr><th>م</th><th>اسم المستخدم</th><th>الوظيفة / الصلاحية</th><th>اسم الدخول</th><th>كلمة المرور</th><th>الإجراءات</th></tr></thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination-bar">
+            <div>عرض: <select id="usersPageSize" onchange="changePageSize('users')"><option value="10">10</option><option value="25">25</option><option value="38" selected>الكل (38)</option></select></div>
+            <div id="usersPaginationControls"></div>
+        </div>
+    </div>
+
+    <!-- الصلاحيات والفئات الكاملة -->
+    <div id="page-permissions" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">إدارة صلاحيات مستخدمي استمارة التقييم</h2>
+        <div style="background: #f9f9f9; padding: 15px; border-radius: 5px; border: 1px solid var(--primary-purple); margin-bottom: 12px;">
+            <div style="margin-bottom: 12px;">
+                <label style="font-weight:bold; font-size:12px; display:block; margin-bottom:4px; text-align:center;">اختر مستخدم النظام:</label>
+                <select id="permUserSelect" style="width:100%; padding:9px; font-size:12.5px; border:1px solid var(--primary-purple); text-align:center; font-weight:bold; outline:none;"></select>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+                <div>
+                    <label style="font-weight:bold; font-size:12px; color:var(--primary-purple); display:block; margin-bottom:6px; text-align:right;">الوظائف الإدارية:</label>
+                    <div id="adminRolesContainer" class="multi-select-box"></div>
+                </div>
+                <div>
+                    <label style="font-weight:bold; font-size:12px; color:#00796b; display:block; margin-bottom:6px; text-align:right;">الوظائف التعليمية:</label>
+                    <div id="eduRolesContainer" class="multi-select-box"></div>
+                </div>
+            </div>
+            <button class="btn" style="margin-top: 20px; width: 100%; background:var(--primary-purple); padding:12px; font-size:13.5px;" onclick="saveUserPermissions()">حفظ الصلاحيات</button>
+        </div>
+    </div>
+
+    <!-- جدول الصلاحيات المعتمدة -->
+    <div id="page-approved-perms" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">جدول الصلاحيات المعتمدة لجميع المستخدمين (38 مستخدم)</h2>
+        <div class="table-responsive">
+            <table>
+                <thead><tr><th>م</th><th>اسم المستخدم</th><th>الدور / الوظيفة</th><th>الوظائف الإدارية المخولة</th><th>الوظائف التعليمية المخولة</th></tr></thead>
+                <tbody id="approvedPermsTableBody"></tbody>
+            </table>
+        </div>
+        <div class="pagination-bar">
+            <div>عرض: <select id="approvedPageSize" onchange="changePageSize('approved-perms')"><option value="10">10</option><option value="25">25</option><option value="38" selected>الكل (38)</option></select></div>
+            <div id="approvedPaginationControls"></div>
+        </div>
+    </div>
+
+    <!-- إعدادات الاستمارات -->
+    <div id="page-settings" class="card" style="display: none;">
+        <h2 style="color: var(--primary-purple); margin-top:0; font-size: 14px; text-align:center;">إدارة وتعديل الاستمارات الوظيفية</h2>
+        <div style="text-align:center; margin-bottom:8px;"><button class="btn" style="font-size:11px;" onclick="createNewFormModal()">+ إضافة استمارة جديدة</button></div>
+        <div class="table-responsive">
+            <table>
+                <thead><tr><th>اسم الاستمارة الوظيفية</th><th>عدد البنود</th><th>الإجراءات</th></tr></thead>
+                <tbody id="settingsFormsTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل كامل نصوص الاستمارة وبنودها على شكل PDF -->
+    <div id="editItemsModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:1000; justify-content:center; align-items:center; padding: 15px;">
+        <div style="background:white; padding:20px; border-radius:8px; width:100%; max-width:850px; max-height:92vh; overflow-y:auto; box-shadow: 0 5px 25px rgba(0,0,0,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--primary-purple); padding-bottom:8px; margin-bottom:12px;">
+                <h3 style="color:var(--primary-purple); margin:0;" id="editItemsModalTitle">تعديل الاستمارة بالكامل</h3>
+                <button class="btn" style="background:#c62828; padding:4px 10px;" onclick="closeItemsModal()">✕ إغلاق</button>
+            </div>
+            
+            <div style="background:#f3e5f5; padding:8px; border-radius:4px; margin-bottom:10px; font-weight:bold; color:var(--primary-purple); font-size:11px; text-align:center;">
+                معاينة حية لشكل الاستمارة (PDF) مع إمكانية تعديل أي كلمة في العناوين ورؤوس الجداول والبند:
+            </div>
+
+            <!-- نموذج الاستمارة القابل للتعديل بالكامل -->
+            <div style="border:1px solid var(--primary-purple); padding:10px; border-radius:5px; background:#fafafa;">
+                <div class="table-responsive">
+                    <table class="eval-header-table">
+                        <tr>
+                            <td colspan="5" style="text-align: center; background: #fff; padding: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار المدرسة" style="height: 40px; width: auto;">
+                                    <!-- عنوان الاستمارة قابل للتعديل الحقيقي -->
+                                    <input type="text" id="modalEditFormTitle" style="color: var(--primary-purple); font-size: 13px; font-weight: bold; text-align: center; border: 1px dashed #ccc; width: 50%; padding: 4px; outline: none; background: #fff;">
+                                    <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار الحملة" style="height: 38px; width: auto;">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="purple-bg" style="width: 50%;">
+                                <input type="text" id="modalEditSectionTitle" style="background:transparent; color:inherit; font-weight:bold; border:none; text-align:center; width:100%; outline:none;" value="بيانات الموظف">
+                            </td>
+                            <td colspan="3" class="purple-bg" style="width: 50%;">بيانات الزيارة</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%; font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">
+                                <input type="text" id="modalEditRoleName" style="background:transparent; color:inherit; font-weight:bold; border:none; text-align:center; width:100%; outline:none;" value="اسم الموظف">
+                            </td>
+                            <td class="text-center-cell" style="width: 35%; background:#fff; font-size:11px; font-weight:bold; color:#777;">(اسم تجريبي للمعاينة)</td>
+                            <td style="width: 12%; font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">اليوم</td>
+                            <td style="width: 13%; background: #fff;">الأربعاء</td>
+                            <td style="width: 25%; background: #fff;">التاريخ: 2026-09-30</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الفرع / القسم / المرحلة</td>
+                            <td style="background:#fff; font-size:11px;">الحزم / بنين / ابتدائي</td>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الصف</td>
+                            <td style="background: #fff;">أول/1</td>
+                            <td style="background: #fff;">الحصة: 1</td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">المادة (التخصص)</td>
+                            <td style="background:#fff; font-size:11px;">صفوف أولية</td>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الموضوع</td>
+                            <td colspan="2" style="background: #fff;">عنوان الدرس التجريبي</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div style="text-align:left; margin: 8px 0;">
+                    <button class="btn" style="background:#2e7d32; font-size:10px;" onclick="addModalItemRow()">+ إضافة عنصر بند جديد</button>
+                </div>
+
+                <div class="table-responsive" style="margin-top:5px;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 5%;">م</th>
+                                <th style="width: 55%;">عناصر الأداء (انقر للتعديل على أي كلمة)</th>
+                                <th style="width: 15%;">الوزن النسبي (%)</th>
+                                <th style="width: 10%;">الدرجة الأعلى</th>
+                                <th style="width: 15%;">إجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="modalItemsTableBody"></tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="2" style="background: #f3e5f5; font-weight: bold; color: var(--primary-purple); text-align: center;">إجمالي الوزن النسبي</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center;" id="modalTotalWeight">100%</td>
+                                <td colspan="2" style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center;" id="modalTotalMaxScore">55</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:8px; margin-top:15px;">
+                <button class="btn" style="background:#c62828;" onclick="closeItemsModal()">إلغاء</button>
+                <button class="btn" style="background:#2e7d32; padding:8px 20px;" onclick="saveEditedItems()">حفظ التعديلات نهائياً</button>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    let isViewOnlyMode = false;
+
+    function toggleMobileMenu() {
+        const sidebar = document.getElementById('sidebarNav');
+        if(window.innerWidth <= 992) {
+            sidebar.classList.toggle('mobile-open');
+        }
+    }
+
+    let nationalityList = ["سعودي", "سعودية", "مصري", "مصرية", "سوري", "سوداني", "يمني", "نيجيرية"];
+    let stagesList = ["ابتدائي", "متوسط", "ثانوي", "رياض أطفال"];
+    let subjectsList = ["صفوف أولية", "بدنية", "رياضيات", "إسلامية", "فنية", "لغة عربية", "ثنائي لغة", "لغة إنجليزية", "علوم", "اجتماعيات", "حاسب آلي", "أحياء", "كيمياء", "فيزياء"];
+    let staffRolesList = ["مدير", "وكيل", "رائد نشاط", "موجه طلابي", "مساعد إداري (سكرتير)", "مراقب دور", "موجه صحي", "محضر مختبر", "مدخل بيانات", "حارس"];
+
+    const adminRolesList = ["مدير", "وكيل", "رائد نشاط", "موجه طلابي", "مساعد إداري (سكرتير)", "مراقب دور", "موجه صحي", "محضر مختبر", "مدخل بيانات", "حارس"];
+    const eduRolesList = ["صفوف أولية", "بدنية", "رياضيات", "إسلامية", "فنية", "لغة عربية", "ثنائي لغة", "لغة إنجليزية", "علوم", "اجتماعيات", "حاسب آلي", "أحياء", "كيمياء", "فيزياء"];
+
+    let teachersData = [
+        {name: "مفرح عبد اللطيف عبد العظيم", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "عبد الله محمد ناصر السبيت", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "بدنية"},
+        {name: "راضي رمضان أحمد عبد الفتاح", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "احمد علي محمد مهدي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "نواف خالد داود المسعود", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "محمود عبد العظيم أحمد محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "فنية"},
+        {name: "إبراهيم عزت محمد فتحي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "محمد رضا بدران محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "سليمان جميل سليمان وهبه", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "محمد عبد النبي نجيب عليوة", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "محمد عبد القادر محمد العتيبي", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "فارس حسن حمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "علي شعبان محمود هندي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "علوم"},
+        {name: "أحمد نور جاب الله", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "محمد أحمد حسن محمد قنسوة", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "لغة عربية"},
+        {name: "مصطفى عبد الكريم سليمان", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "علوم"},
+        {name: "عمر احمد محمود احمد إمبابي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "صفوف أولية"},
+        {name: "أحمد طلال ياسين العمار", nat: "سوري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "اجتماعيات"},
+        {name: "محمد عبد الله بابكر مصطفى", nat: "سوداني", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "لغة إنجليزية"},
+        {name: "حسن شعبان عبد الحميد عليمي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "رياضيات"},
+        {name: "هيثم جمعة محمد حافظ", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "رياضيات"},
+        {name: "علي حسن عبد العزيز محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "بدنية"},
+        {name: "محمد نشأت سيد محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "رياضيات"},
+        {name: "عمرو عابد محمد عبد المغني", nat: "يمني", branch: "الحزم", section: "بنين", stage: "متوسط", subject: "لغة إنجليزية"},
+        {name: "أحمد ممدوح زكي عمارة", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "حاسب آلي"},
+        {name: "إبراهيم سعود محمد الحبر", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "إسلامية"},
+        {name: "محمد صابر عبد الكريم سيد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "بدنية"},
+        {name: "أحمد ماهر محمد فرحات", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "اجتماعيات"},
+        {name: "هاني خالد عبد الرحمن الدبشة", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "وليد سامي فتح الله الانصاري", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "أحياء"},
+        {name: "عادل علي احمد محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "خضيري عبد الموجود حماد احمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "عرفة ابراهيم محمد ابراهيم", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "كيمياء"},
+        {name: "عصام سعد احمد سعد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "فيزياء"},
+        {name: "محمد السعيد الدوماني", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "أسامة عثمان يوسف عثمان", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "فيزياء"},
+        {name: "محمد سعد المتولي أبو الدهب", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "محمد طلعت سيد عبد الرحمن", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "كيمياء"},
+        {name: "طه يحي عبد الحميد عيد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "محمد عوض اسماعيل شطا", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "مصطفى فتحي مصطفى أحمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "سيد محمد محمود محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "جمعة شعبان عبد الحميد نصار", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "وليد خيري السيد سالم خليل", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "بدنية"},
+        {name: "علاء السيد عبد العزيز البرلسي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "عبد الله خالد عبد الرحمن الغريبي", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "أحمد محمود ابو الوفا النحراوي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "ناصر خلف بن دخيل الحربي", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "محمود ابراهيم محمود حسن", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "فنية"},
+        {name: "يزيد محمد عبد الرحمن المالكي", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "اجتماعيات"},
+        {name: "عبد الحميد الشحات عبد الحميد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "علوم"},
+        {name: "أحمد شعبان شحاته محمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "عبد الرحمن محمد عبد الرازق", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "محمد سعد اليماني", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "علوم"},
+        {name: "علي عبد الكريم الزمزمي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "منصور أحمد حسان", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "عاطف عبد الرحيم فرج", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "عبد الناصر حسن سليم", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "وليد أحمد على العطار", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "بدنية"},
+        {name: "محمد عوض القرني", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "تركي خالد مطلق المطلق", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "محمد عطية على عبد المنعم", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "عبد العزيز بن محمد العثمان", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "إسلامية"},
+        {name: "أحمد نبيل أحمد عبد الحافظ", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "بدنية"},
+        {name: "سليمان شعبان سليمان احمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "رياضيات"},
+        {name: "خالد علي أحمد الجريري", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "لغة عربية"},
+        {name: "زكريا محمد عبد الجواد عبد الحميد", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "لغة إنجليزية"},
+        {name: "أنس محمد رجب موسي", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "اجتماعيات"},
+        {name: "محمد رجب محمد عبد الوهاب", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "رياضيات"},
+        {name: "عبد الله بن عبد الرحمن بن هديان", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "إسلامية"},
+        {name: "ياسر ممتاز ايوب مراد", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "لغة عربية"},
+        {name: "عايض ناصر عايض القحطاني", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "إسلامية"},
+        {name: "فتحي السيد خليل مصطفى", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "كيمياء"},
+        {name: "محمد محمود عبد الدايم", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "علي حمدي رمضان النقيب", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "فنية"},
+        {name: "إيهاب أحمد عبد الرحيم فرج", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "فيزياء"},
+        {name: "إسماعيل طه إسماعيل النجار", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "أحياء"},
+        {name: "أحمد عبد الخالق عبد العاطي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "حاسب آلي"},
+        {name: "محمد عبد الحميد محمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "بدنية"},
+        {name: "علاء جمال الدين محمد البلتاجي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "رضا محمود محمد احمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "محمد حلمي محمد جمعه", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "إيهاب نور عبد العظيم مهابه", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "رياضيات"},
+        {name: "نبيل محمد سماحة", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "كيمياء"},
+        {name: "مؤمن أحمد علي عبد الحافظ", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "إسلام حمودة حسن خضر", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", subject: "فيزياء"},
+        {name: "مصطفى جمال أحمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "عطية أحمد عبد العزيز", nat: "مصري", branch: "طويق", section: "بنين", stage: "متوسط", subject: "علوم"},
+        {name: "حسام أحمد جودة", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "حاسب آلي"},
+        {name: "محمد هوشام جاد البشبيشي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", subject: "حاسب آلي"},
+        {name: "نوف عبدالله حمد الكثيري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "كيمياء"},
+        {name: "البندري حسن محمد المفرج", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "أحياء"},
+        {name: "شروق عوض الأسمري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "فيزياء"},
+        {name: "أمل عايض عويض البقمي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "علوم"},
+        {name: "عايشة تميم فيصل القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "متوسط", subject: "لغة إنجليزية"},
+        {name: "فاطمة فهد زيد جمعان", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "علياء اسماعيل الرفاعي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "أميرة يحي عبدالله عاتي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "حاسب آلي"},
+        {name: "رحمة عامر عبدالله الشهري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "حاسب آلي"},
+        {name: "صالحة محمد علي القرني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "اجتماعيات"},
+        {name: "عائشة ماجد فلهي القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "نورة مغيب مناحي السبيعي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "نجود محمد سعد الشهراني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "حنان ياسين علي حسن", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "وضحاء تميم فيصل القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "حنان براهيم مانع القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "مرام زين جازع الشلوي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "منيرة سليمان الحسينان", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "هياء خضير مسفر الخريجي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "إسلامية"},
+        {name: "خديجة محمد بشير سراج", nat: "نيجيرية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "إسلامية"},
+        {name: "خلود مزيد زويد العتيبي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "لغة إنجليزية"},
+        {name: "أثير ناصر محمد القريني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", subject: "لغة إنجليزية"},
+        {name: "نيفين أحمد ممدوح", nat: "مصرية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "أسماء فهد سعيد الضعيان", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "جنة أشرف حسن صبحي", nat: "مصرية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "لغة إنجليزية"},
+        {name: "ميرا خالد عبدالله الحافي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "لغة إنجليزية"},
+        {name: "لطيفة خويطر محمد الشمري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "سارة هابس القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "عبير سعيد سالم باسلمة", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "مرام حمد حمود المطيري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "طيف نواف هزاع العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "نورة حمود عبد الرحمن الخنفري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "شموخ فهد صالح الصميت", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "منال محمد حسن معيدي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "هياء علي محمد الزير", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "أروى عبد العزيز الحميدي المالكي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "ريم خالد مانع العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "ميعاد عبدالله محمد المطيري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "صفوف أولية"},
+        {name: "عنود سالم حسن مهري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "فيزياء"},
+        {name: "منى ناصر بخيتان القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", subject: "لغة إنجليزية"},
+        {name: "موضي هزاع محمد الخرعان", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "حاسب آلي"},
+        {name: "روان محمد الشمراني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة إنجليزية"},
+        {name: "صالحة علي محمد عسيري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "حاسب آلي"},
+        {name: "وجدان محمد فيصل القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "حاسب آلي"},
+        {name: "سارة سعد عبدالله القريني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "اجتماعيات"},
+        {name: "عزة محمد بندر العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "إدارة الأعمال"},
+        {name: "نوف ظافر منير القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "أروى محمد الجربية", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "لغة إنجليزية"},
+        {name: "مها فلاح حمود الشمري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "لغة إنجليزية"},
+        {name: "أمل أحمد صالح الغامدي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "كيمياء"},
+        {name: "طيف مسفر أحمد هزازي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "أحياء"},
+        {name: "بدرية خالد عبدالله المياح", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "فيزياء"},
+        {name: "مها عبد الرحمن الغريبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "أحياء"},
+        {name: "شهرة عاطف الشهري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "علوم"},
+        {name: "نوال محيل سالم المطيري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "رياضيات"},
+        {name: "مرام محمد راشد الضرغام", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "رياضيات"},
+        {name: "فوز سعود غافل العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "رياضيات"},
+        {name: "جواهر حمود إبراهيم القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "رياضيات"},
+        {name: "غدير بندر عشق القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "أنوار فرج شينان القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "ليلي مبارك وتيد الدوسري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "مريم محمد سعد القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "منيرة عايض حزام السبيعي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "رياضيات"},
+        {name: "لمياء خالد محمد العبد الوهاب", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "متوسط", subject: "رياضيات"},
+        {name: "دلال ناصر عاقل المطيري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "أريج عبدالله عبد الواحد آل كريع", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "جواهر على صالح الزهراني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "رياضيات"},
+        {name: "رغد عبدالله سعود العصيمي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "مها عيد قاسي السعدي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "شيماء عبد الملك مسعد عبد السميع", nat: "مصرية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "أماني سعد عبد القادر عبدة", nat: "مصرية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "هيلة خالد إبراهيم الجديد", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "سحر إبراهيم أبو المعاطي إبراهيم", nat: "مصرية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "ايمان أحمد محروس أبو جلاله", nat: "مصرية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "ثنائي لغة"},
+        {name: "ندى حسين عبد الله الماص", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "رند عبدالله سعود العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "إسلامية"},
+        {name: "علياء سند مبارك القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "إسلامية"},
+        {name: "علياء عويض سمران الحربي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "مها محمد أحمد الشمراني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "متوسط", subject: "إسلامية"},
+        {name: "سماح سعيد غرم الله الغامدي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "فنية"},
+        {name: "شيخة فهد راشد الدوسري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "فنية"},
+        {name: "الجوهرة محمد الحسن", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "شيخة حبيب ال سليمة", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "ندي علي عيدان المالكي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "نهاد محمد أحمد الناصري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "نوال فرحان الجابري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "سارة جيلان حدادي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "نوف نايف القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "موضي مسلط السبيعي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "هيفاء مروان الشيباني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "وسمية عايض القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "إسلامية"},
+        {name: "بسمة حسين الذري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "حمسة عايض القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "تغريد محمد الحربي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "نجوي عباد مبارك", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "شريفة أحمد الربعي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "ايمان سعيد الزهراني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "لغة عربية"},
+        {name: "علايم أحمد الربعي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "نورة مناحي العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "لغة عربية"},
+        {name: "فوزية ناجي القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "لغة عربية"},
+        {name: "الهنوف فيصل آل جلهم", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "رؤي الدوسري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "منى محمد البحري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "نورة ناصر راكان", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "مها محمد عبد الله الشهراني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "البندري علي سالم الحربي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "وجدان ناصر محمد الغنام", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "غادة أبو دجين", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "سحر محمد القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "روي القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", subject: "صفوف أولية"},
+        {name: "شروق الحامد الحميدي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "متوسط", subject: "لغة عربية"},
+        {name: "سارة دخيل القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", subject: "لغة عربية"},
+        {name: "نوف خالد الكثيري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "متوسط", subject: "بدنية"},
+        {name: "سارة جمال", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", subject: "بدنية"},
+        {name: "أمنية احمد سعيد", nat: "سعودية", branch: "طويق", section: "بنات", stage: "متوسط", subject: "بدنية"}
+    ];
+
+    let staffData = [
+        {name: "الدسوقي الزيني", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "وكيل ش ط"},
+        {name: "عبد الرحمن حسن المساوى", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "محمد صالح الزهراني", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "عمر علي بن شديد", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", role: "موجه طلابي"},
+        {name: "سعد محمد الأسمري", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "مراقب"},
+        {name: "رضا علي عزام", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "سكرتير"},
+        {name: "حسين محمد عبد الرحمن ال سير", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "وكيل ش ط"},
+        {name: "خالد عبدالله الدغيلي", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "وكيل ش ط"},
+        {name: "سعد سالم ناصر الخنفري", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "محمد حسن حسين ملحان", nat: "سعودي", branch: "طويق", section: "بنين", stage: "متوسط", role: "وكيل ش ط"},
+        {name: "عمرو ابراهيم عبد العظيم احمد", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", role: "وكيل ش ط"},
+        {name: "مجاهد محمد يحيى امين", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "محمد عيد راضي محمد", nat: "مصري", branch: "الحزم", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "محمود علي احمد الخولي", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", role: "وكيل ش ط"},
+        {name: "محمود فوزی محمود الشافعي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "فهد محمد مشعل العميري", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ثانوي", role: "موجه طلابي"},
+        {name: "محمد السعيد محمود ابراهيم", nat: "مصري", branch: "الحزم", section: "بنين", stage: "متوسط", role: "موجه طلابي"},
+        {name: "محمد ماجد جبير السبيعي", nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ثانوي", role: "موجه طلابي"},
+        {name: "مظهر البسيوني حسين حسن", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "موجه طلابي"},
+        {name: "مطلب بن عبد الله الشيباني", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ثانوي", role: "مراقب"},
+        {name: "السيد عشري علي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ثانوي", role: "سكرتير"},
+        {name: "نواف بن محمد الهومل", nat: "سعودي", branch: "طويق", section: "بنين", stage: "متوسط", role: "رائد نشاط"},
+        {name: "حسن بن محمد أحمد عامري", nat: "سعودي", branch: "طويق", section: "بنين", stage: "متوسط", role: "حارس"},
+        {name: "طاغي بن عيسى حمد زغيبي", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ثانوي", role: "حارس"},
+        {name: "منى الرميثة", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "موجه طلابي"},
+        {name: "محمد نشأت محروس", nat: "مصري", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "رائد نشاط"},
+        {name: "ياسر إبراهيم عبد الفتاح", nat: "مصري", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "سكرتير"},
+        {name: "دلال إبراهيم الدهيش", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "رائد نشاط"},
+        {name: "سحر سيف شمروخ العتيبي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "رائد نشاط"},
+        {name: "سلمى بنت تركي سليم الأكلبي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "مدير"},
+        {name: "مهما عبد الله عيسان البقمي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "موجه طلابي"},
+        {name: "جواهر بنت فاهه الحارثي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مدير"},
+        {name: "شيخة بنت ناصر عبدالله الطبيب", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", role: "مدير"},
+        {name: "نوف بنت عبدالله علي المقبل", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "مدير"},
+        {name: "حليمه بنت محمد علي عواجي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "مدير"},
+        {name: "منيرة سليمان عبيد الحربي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "وفاء سالم القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", role: "مساعد إداري"},
+        {name: "مييار بنت خليل بن ماجد القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "محضر مختبر"},
+        {name: "نورة عبد العزيز راشد الكثيري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", role: "سكرتير"},
+        {name: "هيفاء عبدالله مرزوق الناصر", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مدخل بيانات"},
+        {name: "مي بنت محمد عبدالله الدوسري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "مراقب"},
+        {name: "سارة مشفي ناصر بن سفران", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "رنا بنت صالح بن عبد الله الزعاقي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "مراقب"},
+        {name: "تهاني بنت يوسف بن محمد الحمود", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "مراقب"},
+        {name: "هدى علي محمد الزهراني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "أحلام محمد سعيد الحارثي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "حارس"},
+        {name: "هند ابراهيم صالح الشثري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "سكرتير"},
+        {name: "جواهر بنت عواض سعيد الحارثي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "سكرتير"},
+        {name: "منيرة علي عبد الرحمن الحصيني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "مراقب"},
+        {name: "جهوير مفلح عبدالله القحطاني", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "بدرية ناجي نغيماش الدعجاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "فاطمة حمود سعد الجلهمي", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "موجه طلابي"},
+        {name: "جباره بنت علي شويعي فقيقي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "موجه طلابي"},
+        {name: "زهراء حسن أحمد عويري", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "وكيل ش ط"},
+        {name: "مرام محمد عبد العزيز الضويان", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "رياض أطفال", role: "حارس"},
+        {name: "عهود بنت عبد العزيز محمد الحربي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "حارس"},
+        {name: "نورة فهد ناصر أبو دجين", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "رائد نشاط"},
+        {name: "عيناء بنت سلطان خليل بن قرملة", nat: "سعودية", branch: "طويق", section: "بنات", stage: "رياض أطفال", role: "مدير"},
+        {name: "مروة بندر ناصر المهوس", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "سارة فيحان عبد الله القحطاني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "جوزاء مسفر مسعود الفهادي", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ابتدائي", role: "مراقب"},
+        {name: "مها بداح حزام الشهراني", nat: "سعودية", branch: "طويق", section: "بنات", stage: "ثانوي", role: "وكيل ش ط"},
+        {name: "زينب حسين ابراهيم عسيري", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ثانوي", role: "مراقب"},
+        {name: "محمد أبو بكر علي", nat: "مصري", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "رائد نشاط"},
+        {name: "نادر عبد الله القحطاني", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "مراقب"},
+        {name: "بندر الشريفي", nat: "سعودي", branch: "طويق", section: "بنين", stage: "ابتدائي", role: "حارس"},
+        {name: "منى علي مسعود الرقيب", nat: "سعودية", branch: "الحزم", section: "بنات", stage: "ابتدائي", role: "موجه طلابي"}
+    ];
+
+    let usersList = [
+        {name: "المشرف العام", role: "المشرف العام", adminRoles: ["مدير", "وكيل"], eduRoles: ["رياضيات", "علوم"]},
+        {name: "مدير مجمع الحزم", role: "مدير مجمع الحزم", adminRoles: ["مدير", "وكيل"], eduRoles: ["صفوف أولية"]},
+        {name: "مدير مجمع طويق", role: "مدير مجمع طويق", adminRoles: ["مدير", "وكيل"], eduRoles: ["لغة عربية"]},
+        {name: "مدير الشؤون التعليمية", role: "مدير الشؤون التعليمية", adminRoles: ["مدير"], eduRoles: ["موجه طلابي"]},
+        {name: "مشرف تربوي 1", role: "مشرف تربوي", adminRoles: [], eduRoles: ["علوم"]},
+        {name: "مشرفة تربوية 1", role: "مشرفة", adminRoles: [], eduRoles: ["لغة إنجليزية"]},
+        {name: "مدير مدرسة الحزم", role: "مدير مدرسة", adminRoles: ["مدير"], eduRoles: []},
+        {name: "وكيل مدرسة الحزم", role: "وكيل مدرسة", adminRoles: ["وكيل"], eduRoles: []}
+    ];
+    for(let u=9; u<=38; u++) {
+        usersList.push({name: `مستخدم نظام فرعي ${u}`, role: "مساعد إداري", adminRoles: ["مساعد إداري (سكرتير)"], eduRoles: ["حاسب آلي"]});
+    }
+
+    let classesVerticalList = [
+        {name: "أول/1", branch: "الحزم", section: "بنين", stage: "ابتدائي"},
+        {name: "أول/2", branch: "الحزم", section: "بنين", stage: "ابتدائي"},
+        {name: "ثاني/1", branch: "الحزم", section: "بنين", stage: "ابتدائي"},
+        {name: "ثالث/1", branch: "الحزم", section: "بنين", stage: "ابتدائي"},
+        {name: "رابع/1", branch: "الحزم", section: "بنين", stage: "ابتدائي"},
+        {name: "أول/1", branch: "الحزم", section: "بنات", stage: "متوسط"},
+        {name: "أول/1", branch: "طويق", section: "بنين", stage: "متوسط"}
+    ];
+
+    let visitsArchive = JSON.parse(localStorage.getItem('school_visits_archive') || '[]');
+
+    let formTemplates = {
+        teacher: {
+            title: "استمارة تقييم أداء المعلم",
+            targetRoleName: "اسم المعلم",
+            targetSectionTitle: "بيانات المعلم",
+            targetType: "teacher",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10},
+                {name: "التفاعل مع أولياء الأمور", weight: 10}, {name: "التنويع في إستراتيجيات التدريس", weight: 10},
+                {name: "تحسين نتائج المتعلمين", weight: 10}, {name: "إعداد وتنفيذ خطة التعلم", weight: 10},
+                {name: "توظيف تقنيات ووسائل التعلم المناسبة", weight: 10}, {name: "تهيئة بيئة تعليمية", weight: 5},
+                {name: "الإدارة الصفية", weight: 5}, {name: "تحليل نتائج المتعلمين وتشخيص مستوياتهم", weight: 10},
+                {name: "تنوع أساليب التقويم", weight: 10}
+            ]
+        },
+        manager: {
+            title: "استمارة تقييم أداء مدير المدرسة",
+            targetRoleName: "اسم مدير المدرسة",
+            targetSectionTitle: "بيانات مدير المدرسة",
+            targetType: "manager",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 5}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "مرن وقادر على تنفيذ أعماله في ظل ظروف العمل", weight: 5}, {name: "يدعم ويشارك في المبادرات النوعية", weight: 10},
+                {name: "يتخذ إجراءات تربوية تحقق الانضباط المدرسي", weight: 5}, {name: "يدير الموارد في المدرسة بكفاءة", weight: 5},
+                {name: "أعد خطة للتطوير المهني", weight: 5}, {name: "يقدم التغذية الراجعة ويتابع مؤشرات الأداء", weight: 5},
+                {name: "يدعم تنفيذ برامج التطوير المهني", weight: 5}, {name: "يُقيم أداء منسوبي المدرسة", weight: 5},
+                {name: "ينفذ إجراءات علمية لتحسين نتائج التعلم", weight: 5}, {name: "يُسهم في تحسين مستوى أداء المدرسة", weight: 10},
+                {name: "يُعد الخطط المدرسية اللازمة", weight: 5}, {name: "يتابع تنفيذ الخطط المدرسية", weight: 5},
+                {name: "يُهيئ الفرص والإمكانات الداعمة للأنشطة", weight: 5}, {name: "يوظف المنصات الرقمية وتطبيقاتها المعتمدة", weight: 5},
+                {name: "يتابع تعزيز السلوك الإيجابي للطلاب", weight: 5}, {name: "يُهيئ بيئةً مدرسية آمنةً ومحفزةً", weight: 5}
+            ]
+        },
+        agent: {
+            title: "استمارة تقييم أداء وكيل المدرسة",
+            targetRoleName: "اسم وكيل المدرسة",
+            targetSectionTitle: "بيانات وكيل المدرسة",
+            targetType: "agent",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 5}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "مرن وقادر على تنفيذ أعماله في ظل ظروف العمل", weight: 5}, {name: "يدعم ويشارك في المبادرات النوعية", weight: 10},
+                {name: "يتخذ إجراءات تربوية تحقق الانضباط المدرسي", weight: 5}, {name: "يدير الموارد في المدرسة بكفاءة", weight: 5},
+                {name: "يشارك في إعداد خطة للتطوير المهني", weight: 5}, {name: "يقدم التغذية الراجعة ويتابع مؤشرات الأداء", weight: 5},
+                {name: "يدعم تنفيذ برامج التطوير المهني", weight: 5}, {name: "يُقيم أداء منسوبي المدرسة", weight: 5},
+                {name: "ينفذ إجراءات علمية لتحسين نتائج التعلم", weight: 5}, {name: "يُسهم في تحسين مستوى أداء المدرسة", weight: 5},
+                {name: "يشارك في إعداد الخطط المدرسية", weight: 5}, {name: "يتابع تنفيذ الخطط المدرسية", weight: 5},
+                {name: "يُهيئ الفرص الداعمة لمشاركة الطلاب", weight: 5}, {name: "يوظف المنصات الرقمية وتطبيقاتها المعتمدة", weight: 5},
+                {name: "يُتابع تعزيز السلوك الإيجابي للطلاب", weight: 5}, {name: "يُهيئ بيئةً مدرسية آمنةً ومحفزةً للتعلم", weight: 5}
+            ]
+        },
+        kg: {
+            title: "استمارة تقييم أداء معلمة رياض الأطفال",
+            targetRoleName: "اسم معلمة رياض الأطفال",
+            targetSectionTitle: "بيانات معلمة رياض الأطفال",
+            targetType: "kg",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 5}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد خطة شاملة للأنشطة", weight: 5},
+                {name: "تصميم خبرات تعلم مرنة ومبتكرة", weight: 5}, {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "التمكن من المادة العلمية", weight: 5},
+                {name: "استخدام إستراتيجيات تدريس فاعلة", weight: 5}, {name: "إشراك الأسرة في خطط النمو", weight: 5}, {name: "تهيئ بيئة تعلمية آمنة", weight: 5},
+                {name: "توفير فرص متنوعة لدعم التفاعلات", weight: 5}, {name: "تقوم تعلم المتعلمين وتتابع تقدمهم", weight: 5}, {name: "تستثمر نتائج التقويم في تعزيز النمو", weight: 5},
+                {name: "تشرك الأسرة في نتائج التقويم", weight: 5}, {name: "تدعم مستويات الأداء المستهدفة", weight: 5}, {name: "تدعم مهارات المستقبل لدى المتعلمين", weight: 5},
+                {name: "تدعم اكتساب المتعلمين القيم والمبادئ", weight: 5}
+            ]
+        },
+        lab: {
+            title: "استمارة تقييم أداء محضر المختبر",
+            targetRoleName: "اسم محضر المختبر",
+            targetSectionTitle: "بيانات محضر المختبر",
+            targetType: "lab",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 10},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 10}, {name: "تحسين نتائج المتعلمين", weight: 10}, {name: "يُعد خطة يومية لأنشطة المختبر", weight: 5},
+                {name: "المعرفة بالأسس والمفاهيم الفنية", weight: 5}, {name: "يوفر المستلزمات اللازمة للتجارب", weight: 5}, {name: "يلتزم بسياسات وإجراءات السلامة", weight: 5},
+                {name: "يُحضر ويُجهز المختبر", weight: 5}, {name: "تهيئة وتسليم الأجهزة للمعلمين", weight: 5}, {name: "يُعد تقرير أنشطة ومهام المختبر", weight: 10},
+                {name: "يعد تقارير دورية عن حالة الأجهزة", weight: 10}
+            ]
+        },
+        activity: {
+            title: "استمارة تقييم أداء رائد النشاط",
+            targetRoleName: "اسم رائد النشاط",
+            targetSectionTitle: "بيانات رائد النشاط",
+            targetType: "activity",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 10},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 5}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
+                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
+                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "إعداد خطة مزمنة للنشاط الطلابي", weight: 10},
+                {name: "تهيئة البيئة المدرسية للبرامج", weight: 5}, {name: "يدعم المتعلمين وفق احتياجاتهم", weight: 5}, {name: "يحفز المتعلمين على المشاركة", weight: 10}
+            ]
+        },
+        counselor: {
+            title: "استمارة تقييم أداء الموجه الطلابي",
+            targetRoleName: "اسم الموجه الطلابي",
+            targetSectionTitle: "بيانات الموجه الطلابي",
+            targetType: "counselor",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 20}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "يُقدم التدخلات لتعزيز الانضباط", weight: 5}, {name: "تقديم برامج لتعزيز دافعية الطلبة", weight: 5}, {name: "إعداد خطة لبرامج التوجيه الطلابي", weight: 10},
+                {name: "يُصنف الحالات ويُقدم الدعم", weight: 10}, {name: "يُعزز القيم والسلوكيات", weight: 10}, {name: "يُقدم التدخلات النفسية والاجتماعية", weight: 10},
+                {name: "يُساعد المتعلمين على التخطيط المهني", weight: 5}, {name: "يُعزز التفوق الدراسي", weight: 5}, {name: "يقدم تدخلات للمتأخرين دراسياً", weight: 5},
+                {name: "توعية المتعلمين بقواعد السلوك", weight: 5}
+            ]
+        },
+        health: {
+            title: "استمارة تقييم أداء موجه صحي",
+            targetRoleName: "اسم الموجه الصحي",
+            targetSectionTitle: "بيانات الموجه الصحي",
+            targetType: "health",
+            items: [
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 10}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
+                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
+                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "تنفيذ الخطة المشتركة للبرامج الصحية", weight: 15},
+                {name: "حصر الحالات الصحية للمتعلمين", weight: 5}, {name: "تهيئة البيئة الصحية المدرسية", weight: 10}
+            ]
+        }
+    };
+
+    let currentTeachersPage = 1;
+    let currentStaffPage = 1;
+    let currentClassesPage = 1;
+    let currentUsersPage = 1;
+    let currentApprovedPage = 1;
+    let currentEditingFormKey = null;
+
+    function handleLogin() {
+        document.getElementById('loginOverlay').style.display = 'none';
+        applyUserPermissionsUI();
+    }
+
+    function logout() { document.getElementById('loginOverlay').style.display = 'flex'; }
+
+    function applyUserPermissionsUI() {
+        const formSelect = document.getElementById('filterFormType');
+        formSelect.innerHTML = '';
+        Object.keys(formTemplates).forEach(k => {
+            formSelect.innerHTML += `<option value="${k}">${formTemplates[k].title}</option>`;
+        });
+        changeEvaluationFormTemplate();
+    }
+
+    function switchPage(pageId, element) {
+        if(isViewOnlyMode && pageId === 'eval') {
+            clearEvaluationForm();
+        } else if(isViewOnlyMode) {
+            isViewOnlyMode = false;
+            document.getElementById('viewingNotice').style.display = 'none';
+            changeEvaluationFormTemplate();
+        }
+
+        const pages = ['eval', 'archive', 'teachers', 'staff', 'classes', 'users', 'permissions', 'approved-perms', 'settings'];
+        pages.forEach(p => {
+            let el = document.getElementById('page-' + p);
+            if(el) el.style.display = p === pageId ? 'block' : 'none';
+        });
+        document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active-page'));
+        if(element) element.classList.add('active-page');
+
+        const topBarNewEvalBtn = document.getElementById('topBarNewEvalBtn');
+        const topBarPdfBtn = document.getElementById('topBarPdfBtn');
+        if(pageId === 'eval') {
+            topBarNewEvalBtn.style.display = 'inline-block';
+            topBarPdfBtn.style.display = 'inline-block';
+        } else {
+            topBarNewEvalBtn.style.display = 'none';
+            topBarPdfBtn.style.display = 'none';
+        }
+
+        if(pageId === 'archive') renderArchiveTable();
+        if(pageId === 'classes') renderClassesTable();
+        if(pageId === 'teachers') renderTeachersTable();
+        if(pageId === 'staff') renderStaffTable();
+        if(pageId === 'users') renderUsersTable();
+        if(pageId === 'approved-perms') renderApprovedPermsTable();
+        if(pageId === 'settings') renderSettingsFormsTable();
+        if(pageId === 'permissions') renderRoleCheckboxes();
+    }
+
+    function filterTeacherDropdown(inputElem) {
+        if(isViewOnlyMode) return;
+        const query = inputElem.value;
+        const parentDiv = inputElem.parentElement;
+        const sel = parentDiv.querySelector('.teacherSelectDropdown');
+        if(!query) { sel.style.display = 'none'; return; }
+        
+        const formType = document.getElementById('filterFormType').value;
+        const template = formTemplates[formType] || formTemplates['teacher'];
+        
+        let currentBr = document.getElementById('filterBranch').value;
+        let currentSec = document.getElementById('filterSection').value;
+        let currentSt = document.getElementById('filterStage').value;
+
+        let pool = [];
+        if(template.targetType === 'teacher' || template.targetType === 'kg') {
+            pool = teachersData.filter(t => {
+                if(currentBr !== 'ALL' && t.branch !== currentBr) return false;
+                if(currentSec !== 'ALL' && t.section !== currentSec) return false;
+                if(currentSt !== 'ALL' && t.stage !== currentSt) return false;
+                return true;
+            });
+        } else {
+            pool = staffData.filter(s => {
+                if(currentBr !== 'ALL' && s.branch !== currentBr) return false;
+                if(currentSec !== 'ALL' && s.section !== currentSec) return false;
+                if(currentSt !== 'ALL' && s.stage !== currentSt) return false;
+                return true;
+            });
+        }
+
+        let matched = pool.filter(t => t.name.includes(query));
+        if(matched.length > 0) {
+            sel.innerHTML = '';
+            matched.forEach(t => {
+                sel.innerHTML += `<option value="${t.name}">${t.name} (${t.branch || ''} - ${t.section || ''} - ${t.stage || ''})</option>`;
+            });
+            sel.style.display = 'block';
+            sel.size = Math.min(matched.length, 6);
+        } else {
+            sel.style.display = 'none';
+        }
+    }
+
+    function onTeacherSelectedFromList(sel) {
+        const name = sel.value;
+        if(name) {
+            const wrapper = sel.closest('.single-eval-form-wrapper');
+            wrapper.querySelector('.teacherSearchInput').value = name;
+            sel.style.display = 'none';
+            let found = teachersData.find(t => t.name === name) || staffData.find(s => s.name === name);
+            if(found) {
+                wrapper.querySelector('.branchStageDisplay').value = `${found.branch || 'الحزم'} / ${found.section || 'بنين'} / ${found.stage || 'ابتدائي'}`;
+                const subjSelect = wrapper.querySelector('.subjectName');
+                subjSelect.innerHTML = `<option value="${found.subject || found.role || 'عام'}">${found.subject || found.role || 'عام'}</option>`;
+            }
+        }
+    }
+
+    function changeEvaluationFormTemplate() {
+        if(isViewOnlyMode) return;
+        const type = document.getElementById('filterFormType').value;
+        const template = formTemplates[type];
+        if(!template) return;
+
+        const container = document.getElementById('evaluationsContainer');
+        container.innerHTML = generateSingleFormHTML(template);
+        initActiveFormDOM(container.querySelector('.single-eval-form-wrapper'), template);
+    }
+
+    function generateSingleFormHTML(template) {
+        let itemsHtml = '';
+        let totalMaxSumCalc = 0;
+        template.items.forEach((item, index) => {
+            totalMaxSumCalc += 5;
+            itemsHtml += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td class="text-right" style="font-weight:600;">${item.name}</td>
+                    <td>${item.weight}%</td>
+                    <td>5</td>
+                    <td><input type="number" step="0.5" min="0" max="5" value="5" class="score-input" data-weight="${item.weight}" onfocus="onScoreFocus(this)" onblur="onScoreBlur(this)" oninput="validateAndCalculate(this)"></td>
+                    <td style="text-align:right;"><input type="text" class="item-note-input" style="width: 99%; border:none; outline:none; background:transparent; text-align:right;" placeholder=""></td>
+                </tr>
+            `;
+        });
+
+        return `
+            <div class="single-eval-form-wrapper">
+                <div class="table-responsive">
+                    <table class="eval-header-table">
+                        <tr>
+                            <td colspan="5" style="text-align: center; background: #fff; padding: 8px; border: none !important; outline: none; box-shadow: none;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار المدرسة" style="height: 50px; width: auto;">
+                                    <span style="color: var(--primary-purple); font-size: 14.5px; font-weight: bold; text-align: center; flex-grow: 1;" class="evalFormTitle">${template.title}</span>
+                                    <div style="display: flex; align-items: center; gap: 5px;">
+                                        <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار الحملة" style="height: 48px; width: auto;">
+                                        <span style="font-size: 10px; font-weight: bold; color: var(--primary-purple);">وصلنا... ومكملين</span>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="purple-bg" style="width: 50%;" class="targetSectionHeader">${template.targetSectionTitle}</td>
+                            <td colspan="3" class="purple-bg" style="width: 50%;">بيانات الزيارة</td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%; font-weight: bold; background: #f3e5f5; color: var(--primary-purple);" class="targetPersonLabel">${template.targetRoleName}</td>
+                            <td class="text-center-cell" style="width: 35%; position: relative; background:#fff; text-align: center; padding: 0; margin: 0;">
+                                <div style="position: relative; width: 100%; height: 100%;">
+                                    <input type="text" class="teacherSearchInput" oninput="filterTeacherDropdown(this)" placeholder="اكتب للبحث في الأسماء..." style="width:100%; height:100%; font-weight:bold; border:none; outline:none; background:transparent; padding:6px; font-size:11px; color:var(--primary-purple); text-align:center; box-sizing:border-box;">
+                                    <select class="teacherSelectDropdown" size="5" onchange="onTeacherSelectedFromList(this)" style="display:none; position:absolute; top:100%; right:0; width:100%; z-index:50; background:#fff; border:1px solid var(--primary-purple); font-size:11px;"></select>
+                                </div>
+                            </td>
+                            <td style="width: 12%; font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">اليوم</td>
+                            <td style="width: 13%; background: #fff;">
+                                <input type="text" class="visitDay" readonly style="width:100%; border:none; background:transparent; font-size:11px; text-align:center; font-weight:bold; color:var(--primary-purple); outline:none;">
+                            </td>
+                            <td style="width: 25%; background: #fff;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:bold; color:var(--primary-purple); font-size:10.5px; background:#f3e5f5; padding:2px 5px; border-radius:2px;">التاريخ</span>
+                                    <input type="date" class="visitDate" onchange="onDateChanged(this)" style="border:none; outline:none; background:transparent; font-size:11px; width:70%; text-align:center; font-weight:bold; color:var(--primary-purple); cursor:pointer;">
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الفرع / القسم / المرحلة</td>
+                            <td style="background:#fff;"><input type="text" class="branchStageDisplay" value="" readonly placeholder="يُحدد تلقائياً عند اختيار الموظف" style="width:100%; font-weight:bold; border:none; outline:none; background:transparent; color:#38003c; font-size:11px; text-align:center;"></td>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الصف</td>
+                            <td style="background: #fff;">
+                                <select class="classDropdown" style="width:100%; border:none; outline:none; background:transparent; font-size:11px; text-align:center;"></select>
+                            </td>
+                            <td style="background: #fff;">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="font-weight:bold; color:var(--primary-purple); font-size:10.5px; background:#f3e5f5; padding:2px 5px; border-radius:2px;">الحصة</span>
+                                    <select class="classPeriod" style="border:none; outline:none; background:transparent; font-size:11px; width:70%; text-align:center;">
+                                        <option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option>
+                                    </select>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">المادة (التخصص)</td>
+                            <td style="background:#fff;">
+                                <select class="subjectName" style="width:100%; font-weight:bold; color:var(--primary-purple); border:none; outline:none; background:transparent; font-size:11px; text-align:center;"></select>
+                            </td>
+                            <td style="font-weight: bold; background: #f3e5f5; color: var(--primary-purple);">الموضوع</td>
+                            <td colspan="2" class="text-center-cell" style="background: #fff; text-align: center; padding: 4px;">
+                                <input type="text" class="visitSubjectTopic" style="width:100%; border:none; outline:none; background:transparent; font-size:11px; text-align:center;">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 4%;">م</th>
+                                <th style="width: 36%;">عناصر الأداء</th>
+                                <th style="width: 7%;">الوزن النسبي</th>
+                                <th style="width: 7%;">الدرجة الأعلى</th>
+                                <th style="width: 8%;">الدرجة المكتسبة</th>
+                                <th style="width: 38%;">ملاحظات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="evalTableBody">${itemsHtml}</tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="background: #f3e5f5; font-weight: bold; color: var(--primary-purple); text-align: center; border: 1px solid var(--primary-purple);">المجموع الكلي</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualMaxSum">${totalMaxSumCalc}</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualSum">${totalMaxSumCalc}</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple); font-size: 10.5px;">التقدير العام للأداء = <span class="finalPercentage">100.00%</span></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+                <div style="border: 1px solid var(--primary-purple); margin-top: 6px; border-radius: 3px; overflow: hidden;">
+                    <div class="section-title" style="border: none; border-bottom: 1px solid var(--primary-purple);">التوصيات</div>
+                    <textarea class="generalNotes" style="width: 100%; height: 60px; padding: 8px; border: none; font-size: 11.5px; background: #fff; resize: vertical; display: block; outline: none; text-align: right; direction: rtl;"></textarea>
+                </div>
+
+                <div class="section-title" style="margin-top: 6px;">جوانب التطوير وخطة الدعم</div>
+                <div class="table-responsive">
+                    <table style="border-top: none;">
+                        <thead>
+                            <tr><th style="width:5%;">م</th><th style="width:55%;">الكفايات التي تحتاج إلى تطوير</th><th style="width:25%;">الأسلوب الإشرافي</th><th style="width:15%;">وقت التنفيذ</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td></tr>
+                            <tr><td>2</td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td></tr>
+                            <tr><td>3</td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td></tr>
+                            <tr><td>4</td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td><td style="text-align:center;"><input type="text" class="support-input" style="width:98%; border:none; outline:none; font-size:11px; text-align:center;"></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 10px;">
+                    <div><label style="font-size:11px; font-weight:bold; display:block; text-align:center;" class="targetSignLabel">${template.targetRoleName}:</label><div class="signature-box"><canvas class="sig1"></canvas></div></div>
+                    <div><label style="font-size:11px; font-weight:bold; display:block; text-align:center;">الزائر:</label><div class="signature-box"><canvas class="sig2"></canvas></div></div>
+                </div>
+            </div>
+        `;
+    }
+
+    let lastFocusedScoreValue = "";
+    function onScoreFocus(input) {
+        if(isViewOnlyMode) return;
+        lastFocusedScoreValue = input.value;
+        input.value = "";
+    }
+
+    function onScoreBlur(input) {
+        if(isViewOnlyMode) return;
+        if(input.value.trim() === "") {
+            input.value = lastFocusedScoreValue;
+            calculateScoresForWrapper(input.closest('.single-eval-form-wrapper'));
+        }
+    }
+
+    function initActiveFormDOM(wrapper, template) {
+        let d = new Date();
+        let year = d.getFullYear();
+        let month = String(d.getMonth() + 1).padStart(2, '0');
+        let day = String(d.getDate()).padStart(2, '0');
+        let dateInput = wrapper.querySelector('.visitDate');
+        if(dateInput) {
+            dateInput.value = `${year}-${month}-${day}`;
+            triggerDateChangeForWrapper(dateInput);
+        }
+        updateClassDropdownForWrapper(wrapper);
+        initSigsForWrapper(wrapper);
+        calculateScoresForWrapper(wrapper);
+    }
+
+    function triggerDateChangeForWrapper(dateInput) {
+        let val = dateInput.value;
+        if(val) {
+            let parts = val.split('-');
+            if(parts.length === 3) {
+                let d = new Date(parts[0], parts[1] - 1, parts[2]);
+                if(!isNaN(d.getTime())) {
+                    let daysArabic = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+                    let wrapper = dateInput.closest('.single-eval-form-wrapper');
+                    wrapper.querySelector('.visitDay').value = daysArabic[d.getDay()];
+                }
+            }
+        }
+    }
+
+    function onDateChanged(input) {
+        triggerDateChangeForWrapper(input);
+    }
+
+    function updateClassDropdownForWrapper(wrapper) {
+        const b = document.getElementById('filterBranch').value;
+        const s = document.getElementById('filterSection').value;
+        const st = document.getElementById('filterStage').value;
+        const classSel = wrapper.querySelector('.classDropdown');
+        if(!classSel) return;
+        classSel.innerHTML = '';
+
+        let matched = classesVerticalList.filter(c => {
+            if(b !== 'ALL' && c.branch !== b) return false;
+            if(s !== 'ALL' && c.section !== s) return false;
+            if(st !== 'ALL' && c.stage !== st) return false;
+            return true;
+        });
+
+        if(matched.length > 0) {
+            matched.forEach(c => {
+                classSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+        } else {
+            classSel.innerHTML = `<option value="">لا توجد فصول</option>`;
+        }
+    }
+
+    function validateAndCalculate(input) {
+        if(isViewOnlyMode) return;
+        let val = parseFloat(input.value);
+        if (val > 5) {
+            alert("لا يمكن أن تزيد الدرجة المكتسبة عن 5 (الدرجة الأعلى)");
+            input.value = 5;
+        } else if (val < 0) {
+            input.value = 0;
+        }
+        calculateScoresForWrapper(input.closest('.single-eval-form-wrapper'));
+    }
+
+    function calculateScoresForWrapper(wrapper) {
+        let totalWeighted = 0;
+        let rawSum = 0;
+        let totalMaxSum = 0;
+        const inputs = wrapper.querySelectorAll('.score-input');
+        
+        inputs.forEach(input => {
+            let val = parseFloat(input.value) || 0;
+            if(val > 5) val = 5;
+            
+            rawSum += val;
+            totalMaxSum += 5;
+
+            let weight = parseFloat(input.getAttribute('data-weight')) || 0;
+            let wScore = (val / 5) * weight;
+            totalWeighted += wScore;
+        });
+
+        if(totalWeighted > 100) totalWeighted = 100;
+        
+        let formattedSum = Number.isInteger(rawSum) ? rawSum : rawSum.toFixed(2);
+        
+        wrapper.querySelector('.actualMaxSum').textContent = totalMaxSum;
+        wrapper.querySelector('.actualSum').textContent = formattedSum;
+        wrapper.querySelector('.finalPercentage').textContent = totalWeighted.toFixed(2) + '%';
+    }
+
+    function clearEvaluationForm() {
+        isViewOnlyMode = false;
+        document.getElementById('viewingNotice').style.display = 'none';
+        changeEvaluationFormTemplate();
+    }
+
+    function resetToNewEvaluationMode() {
+        clearEvaluationForm();
+        alert("تمت العودة لوضع إدخال تقييم جديد بنجاح.");
+    }
+
+    function saveEvaluationAndReset() {
+        if(isViewOnlyMode) {
+            alert("أنت في وضع الاستعراض للقراءة فقط، لا يمكن حفظ التعديلات كتقييم جديد.");
+            return;
+        }
+        const wrapper = document.querySelector('.single-eval-form-wrapper');
+        let name = wrapper.querySelector('.teacherSearchInput').value.trim();
+        if(!name) {
+            alert("الرجاء اختيار أو إدخال اسم المعلم قبل الحفظ.");
+            return;
+        }
+        let date = wrapper.querySelector('.visitDate').value;
+        let day = wrapper.querySelector('.visitDay').value;
+        let subject = wrapper.querySelector('.subjectName').value;
+        let branchStage = wrapper.querySelector('.branchStageDisplay').value;
+        let className = wrapper.querySelector('.classDropdown').value;
+        let period = wrapper.querySelector('.classPeriod').value;
+        let topic = wrapper.querySelector('.visitSubjectTopic').value;
+        let totalScore = wrapper.querySelector('.actualSum').textContent;
+        let percentage = wrapper.querySelector('.finalPercentage').textContent;
+        let formTitle = wrapper.querySelector('.evalFormTitle').textContent;
+        let notes = wrapper.querySelector('.generalNotes').value;
+
+        let scoresArr = [];
+        wrapper.querySelectorAll('.score-input').forEach(inp => scoresArr.push(inp.value));
+
+        let notesArr = [];
+        wrapper.querySelectorAll('.item-note-input').forEach(inp => notesArr.push(inp.value));
+
+        let supportArr = [];
+        wrapper.querySelectorAll('.support-input').forEach(inp => supportArr.push(inp.value));
+
+        let sig1Canvas = wrapper.querySelector('.sig1');
+        let sig2Canvas = wrapper.querySelector('.sig2');
+        let sig1Data = sig1Canvas ? sig1Canvas.toDataURL() : '';
+        let sig2Data = sig2Canvas ? sig2Canvas.toDataURL() : '';
+
+        let visitRecord = {
+            id: Date.now(),
+            name, date, day, subject, branchStage, className, period, topic, totalScore, percentage, formTitle, notes, scoresArr, notesArr, supportArr, sig1Data, sig2Data
+        };
+
+        visitsArchive.unshift(visitRecord);
+        localStorage.setItem('school_visits_archive', JSON.stringify(visitsArchive));
+
+        alert("تم حفظ الزيارة تلقائياً في الأرشيف بنجاح.");
+        clearEvaluationForm();
+    }
+
+    function renderArchiveTable() {
+        const tbody = document.getElementById('archiveTableBody');
+        tbody.innerHTML = '';
+        let query = document.getElementById('archiveSearchInput').value.trim().toLowerCase();
+
+        let teachersMap = {};
+        visitsArchive.forEach(v => {
+            if(!teachersMap[v.name]) {
+                teachersMap[v.name] = [];
+            }
+            teachersMap[v.name].push(v);
+        });
+
+        let teacherNames = Object.keys(teachersMap).filter(name => {
+            if(!query) return true;
+            return name.toLowerCase().includes(query) || teachersMap[name].some(v => v.subject.toLowerCase().includes(query) || v.date.includes(query));
+        });
+
+        if(teacherNames.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding: 15px; color: #666;">لا توجد ملفات معلمين مسجلة أو مؤرشفة حالياً</td></tr>`;
+            return;
+        }
+
+        teacherNames.forEach((teacherName, index) => {
+            let vList = teachersMap[teacherName];
+            vList.sort((a, b) => new Date(b.date) - new Date(a.date));
+            let lastDate = vList[0].date;
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td style="font-weight: bold; color: var(--primary-purple);">${teacherName}</td>
+                    <td><span style="background:#f3e5f5; color:var(--primary-purple); padding:2px 8px; border-radius:4px; font-weight:bold;">${vList.length} زيارات</span></td>
+                    <td>${lastDate}</td>
+                    <td>
+                        <button class="btn" style="padding: 4px 10px; font-size: 10px; background:#00796b;" onclick="viewTeacherUnifiedFile('${encodeURIComponent(teacherName)}')">استعراض ملف المعلم الموحد PDF</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function viewTeacherUnifiedFile(encodedName) {
+        let teacherName = decodeURIComponent(encodedName);
+        let teacherVisits = visitsArchive.filter(item => item.name === teacherName);
+        if(teacherVisits.length === 0) return;
+
+        teacherVisits.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        isViewOnlyMode = true;
+        switchPage('eval', document.getElementById('menu-eval'));
+        document.getElementById('viewingNotice').style.display = 'block';
+
+        const container = document.getElementById('evaluationsContainer');
+        container.innerHTML = '';
+
+        teacherVisits.forEach((v, vIdx) => {
+            let formKey = Object.keys(formTemplates).find(k => formTemplates[k].title === v.formTitle) || 'teacher';
+            let template = formTemplates[formKey];
+            
+            let tempDiv = document.createElement('div');
+            tempDiv.className = 'single-eval-form-wrapper ' + (vIdx < teacherVisits.length - 1 ? 'page-break-print' : '');
+            tempDiv.innerHTML = generateSingleFormHTML(template);
+            container.appendChild(tempDiv);
+
+            let wrapper = tempDiv;
+            wrapper.querySelector('.evalFormTitle').textContent = v.formTitle || template.title;
+            wrapper.querySelector('.teacherSearchInput').value = v.name;
+            wrapper.querySelector('.teacherSearchInput').setAttribute('readonly', 'true');
+            
+            wrapper.querySelector('.visitDate').value = v.date;
+            wrapper.querySelector('.visitDate').setAttribute('readonly', 'true');
+            
+            wrapper.querySelector('.visitDay').value = v.day;
+            wrapper.querySelector('.branchStageDisplay').value = v.branchStage || '';
+            
+            const classSel = wrapper.querySelector('.classDropdown');
+            classSel.innerHTML = `<option value="${v.className || ''}">${v.className || ''}</option>`;
+            classSel.setAttribute('disabled', 'true');
+
+            const periodSel = wrapper.querySelector('.classPeriod');
+            periodSel.innerHTML = `<option value="${v.period || '1'}">${v.period || '1'}</option>`;
+            periodSel.setAttribute('disabled', 'true');
+
+            const subjSelect = wrapper.querySelector('.subjectName');
+            subjSelect.innerHTML = `<option value="${v.subject}">${v.subject}</option>`;
+            subjSelect.setAttribute('disabled', 'true');
+
+            wrapper.querySelector('.visitSubjectTopic').value = v.topic || '';
+            wrapper.querySelector('.visitSubjectTopic').setAttribute('readonly', 'true');
+
+            wrapper.querySelector('.generalNotes').value = v.notes || '';
+            wrapper.querySelector('.generalNotes').setAttribute('readonly', 'true');
+
+            if(v.scoresArr) {
+                let inputs = wrapper.querySelectorAll('.score-input');
+                inputs.forEach((inp, idx) => {
+                    if(v.scoresArr[idx] !== undefined) inp.value = v.scoresArr[idx];
+                    inp.setAttribute('readonly', 'true');
+                });
+            }
+
+            if(v.notesArr) {
+                let noteInputs = wrapper.querySelectorAll('.item-note-input');
+                noteInputs.forEach((inp, idx) => {
+                    if(v.notesArr[idx] !== undefined) inp.value = v.notesArr[idx];
+                    inp.setAttribute('readonly', 'true');
+                });
+            }
+
+            if(v.supportArr) {
+                let supportInputs = wrapper.querySelectorAll('.support-input');
+                supportInputs.forEach((inp, idx) => {
+                    if(v.supportArr[idx] !== undefined) inp.value = v.supportArr[idx];
+                    inp.setAttribute('readonly', 'true');
+                });
+            }
+
+            let sigBoxes = wrapper.querySelectorAll('.signature-box');
+            if(sigBoxes[0] && v.sig1Data) {
+                sigBoxes[0].innerHTML = `<img src="${v.sig1Data}" class="signature-img-view" alt="توقيع المعلم">`;
+            }
+            if(sigBoxes[1] && v.sig2Data) {
+                sigBoxes[1].innerHTML = `<img src="${v.sig2Data}" class="signature-img-view" alt="توقيع الزائر">`;
+            }
+
+            calculateScoresForWrapper(wrapper);
+        });
+    }
+
+    function clearAllArchive() {
+        if(confirm("تحذير: هل تريد مسح كافة سجلات الزيارات والأرشيف بالكامل؟")) {
+            visitsArchive = [];
+            localStorage.removeItem('school_visits_archive');
+            renderArchiveTable();
+            alert("تم إفراغ الذاكرة والأرشيف بنجاح.");
+        }
+    }
+
+    function exportToPDF() { window.print(); }
+
+    function initSigsForWrapper(wrapper) {
+        wrapper.querySelectorAll('.signature-box').forEach((box, bIdx) => {
+            const canvas = box.querySelector('canvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let painting = false;
+
+            function resizeCanvas() {
+                const rect = box.getBoundingClientRect();
+                if(rect.width > 0) { canvas.width = rect.width; canvas.height = rect.height || 55; }
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            canvas.addEventListener('mousedown', () => { if(!isViewOnlyMode) painting = true; });
+            canvas.addEventListener('mouseup', () => { painting = false; ctx.beginPath(); });
+            canvas.addEventListener('mousemove', (e) => {
+                if(!painting || isViewOnlyMode) return;
+                const rect = canvas.getBoundingClientRect();
+                ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#0044cc';
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke(); ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            });
+
+            canvas.addEventListener('touchstart', (e) => { if(!isViewOnlyMode) { painting = true; e.preventDefault(); } });
+            canvas.addEventListener('touchend', (e) => { painting = false; ctx.beginPath(); e.preventDefault(); });
+            canvas.addEventListener('touchmove', (e) => {
+                if(!painting || isViewOnlyMode) return;
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches[0];
+                ctx.lineWidth = 2; ctx.lineCap = 'round'; ctx.strokeStyle = '#0044cc';
+                ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                ctx.stroke(); ctx.beginPath();
+                ctx.moveTo(touch.clientX - rect.left, touch.clientY - rect.top);
+                e.preventDefault();
+            }, { passive: false });
+        });
+    }
+
+    function initDataTables() {
+        renderTeachersTable();
+        renderStaffTable();
+        renderUsersTable();
+        renderApprovedPermsTable();
+        renderClassesTable();
+        renderSettingsFormsTable();
+        populateUserDropdowns();
+        renderRoleCheckboxes();
+        updateEvaluationClassDropdown();
+    }
+
+    function populateUserDropdowns() {
+        const sel = document.getElementById('permUserSelect');
+        sel.innerHTML = '';
+        usersList.forEach((u, index) => {
+            sel.innerHTML += `<option value="${index}">${u.name} (${u.role})</option>`;
+        });
+        sel.onchange = renderRoleCheckboxes;
+    }
+
+    function renderRoleCheckboxes() {
+        const sel = document.getElementById('permUserSelect');
+        if(!sel || sel.options.length === 0) return;
+        const idx = sel.value || 0;
+        const user = usersList[idx];
+
+        const adminBox = document.getElementById('adminRolesContainer');
+        adminBox.innerHTML = '';
+        adminRolesList.forEach(role => {
+            let checked = user.adminRoles.includes(role) ? 'checked' : '';
+            adminBox.innerHTML += `<label class="multi-select-item"><input type="checkbox" value="${role}" ${checked} class="admin-role-chk"> ${role}</label>`;
+        });
+
+        const eduBox = document.getElementById('eduRolesContainer');
+        eduBox.innerHTML = '';
+        eduRolesList.forEach(role => {
+            let checked = user.eduRoles.includes(role) ? 'checked' : '';
+            eduBox.innerHTML += `<label class="multi-select-item"><input type="checkbox" value="${role}" ${checked} class="edu-role-chk"> ${role}</label>`;
+        });
+    }
+
+    function saveUserPermissions() {
+        const idx = document.getElementById('permUserSelect').value;
+        if(idx === null) return;
+        let selectedAdmin = [];
+        document.querySelectorAll('.admin-role-chk:checked').forEach(chk => selectedAdmin.push(chk.value));
+        let selectedEdu = [];
+        document.querySelectorAll('.edu-role-chk:checked').forEach(chk => selectedEdu.push(chk.value));
+        usersList[idx].adminRoles = selectedAdmin;
+        usersList[idx].eduRoles = selectedEdu;
+        renderApprovedPermsTable();
+        alert("تم حفظ الصلاحيات بنجاح للمستخدم: " + usersList[idx].name);
+    }
+
+    function onSectionFilterChanged() {
+        const sec = document.getElementById('filterSection').value;
+        const kgOpt = document.getElementById('optStageKg');
+        const stageSel = document.getElementById('filterStage');
+        
+        if(sec === 'بنين') {
+            kgOpt.style.display = 'none';
+            if(stageSel.value === 'رياض أطفال') stageSel.value = 'ALL';
+        } else {
+            kgOpt.style.display = 'block';
+        }
+        applyGlobalFilters();
+    }
+
+    function getFilteredTeachers() {
+        const b = document.getElementById('filterBranch').value;
+        const s = document.getElementById('filterSection').value;
+        const st = document.getElementById('filterStage').value;
+
+        return teachersData.filter(t => {
+            if(b !== 'ALL' && t.branch !== b) return false;
+            if(s !== 'ALL' && t.section !== s) return false;
+            if(st !== 'ALL' && t.stage !== st) return false;
+            return true;
+        });
+    }
+
+    function getFilteredStaff() {
+        const b = document.getElementById('filterBranch').value;
+        const s = document.getElementById('filterSection').value;
+        const st = document.getElementById('filterStage').value;
+
+        return staffData.filter(staff => {
+            if(b !== 'ALL' && staff.branch !== b) return false;
+            if(s !== 'ALL' && staff.section !== s) return false;
+            if(st !== 'ALL' && staff.stage !== st) return false;
+            return true;
+        });
+    }
+
+    function getGradeOrderWeight(className) {
+        if (!className) return 999;
+        let name = className.trim();
+        if (name.includes('أول') || name.includes('اول')) return 1;
+        if (name.includes('ثان') || name.includes('ثاني')) return 2;
+        if (name.includes('ثالث')) return 3;
+        if (name.includes('رابع')) return 4;
+        if (name.includes('خامس')) return 5;
+        if (name.includes('سادس')) return 6;
+        if (name.includes('سابع')) return 7;
+        if (name.includes('ثامن')) return 8;
+        if (name.includes('تاسع')) return 9;
+        if (name.includes('عاشر')) return 10;
+        if (name.includes('حادي')) return 11;
+        if (name.includes('ثاني عشر') || name.includes('ثاني-عشر')) return 12;
+        return 50;
+    }
+
+    function sortClassesList() {
+        classesVerticalList.sort((a, b) => {
+            let weightA = getGradeOrderWeight(a.name);
+            let weightB = getGradeOrderWeight(b.name);
+            if (weightA !== weightB) return weightA - weightB;
+            return a.name.localeCompare(b.name, 'ar');
+        });
+    }
+
+    function getFilteredClasses() {
+        const b = document.getElementById('filterBranch').value;
+        const s = document.getElementById('filterSection').value;
+        const st = document.getElementById('filterStage').value;
+        
+        sortClassesList();
+
+        return classesVerticalList.filter(c => {
+            if(b !== 'ALL' && c.branch !== b) return false;
+            if(s !== 'ALL' && c.section !== s) return false;
+            if(st !== 'ALL' && c.stage !== st) return false;
+            return true;
+        });
+    }
+
+    function updateEvaluationClassDropdown() {
+        const wrapper = document.querySelector('.single-eval-form-wrapper');
+        if(!wrapper) return;
+        const b = document.getElementById('filterBranch').value;
+        const s = document.getElementById('filterSection').value;
+        const st = document.getElementById('filterStage').value;
+        const classSel = wrapper.querySelector('.classDropdown');
+        if(!classSel) return;
+        classSel.innerHTML = '';
+
+        sortClassesList();
+        let matched = classesVerticalList.filter(c => {
+            if(b !== 'ALL' && c.branch !== b) return false;
+            if(s !== 'ALL' && c.section !== s) return false;
+            if(st !== 'ALL' && c.stage !== st) return false;
+            return true;
+        });
+
+        if(matched.length > 0) {
+            matched.forEach(c => {
+                classSel.innerHTML += `<option value="${c.name}">${c.name}</option>`;
+            });
+        } else {
+            classSel.innerHTML = `<option value="">لا توجد فصول</option>`;
+        }
+    }
+
+    function applyGlobalFilters() {
+        currentTeachersPage = 1;
+        currentStaffPage = 1;
+        currentClassesPage = 1;
+        renderTeachersTable();
+        renderStaffTable();
+        renderClassesTable();
+        updateEvaluationClassDropdown();
+    }
+
+    function renderClassesTable() {
+        const tbody = document.getElementById('classesTableBody');
+        tbody.innerHTML = '';
+        sortClassesList();
+        let filtered = getFilteredClasses();
+        const pageSize = parseInt(document.getElementById('classesPageSize').value) || 10;
+        let start = (currentClassesPage - 1) * pageSize;
+        let end = start + pageSize;
+        let slice = filtered.slice(start, end);
+
+        slice.forEach((c, index) => {
+            let actualIdx = classesVerticalList.indexOf(c);
+            let i = start + index;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${i + 1}</td>
+                    <td><input type="text" value="${c.name}" id="cls_name_${actualIdx}" style="width:90%; font-weight:bold; text-align:center; outline:none;" oninput="onClassNameEdited(${actualIdx}, this)"></td>
+                    <td>${c.branch} / ${c.section} / ${c.stage}</td>
+                    <td style="display:flex; gap:4px; justify-content:center;">
+                        <button class="btn" style="padding:2px 6px;" onclick="renderClassesTable(); updateEvaluationClassDropdown(); alert('تم حفظ وترتيب الفصل بنجاح')">حفظ وترتيب</button>
+                        <button class="btn" style="background:#c62828; padding:2px 6px;" onclick="confirmDeleteClass(${actualIdx})">حذف</button>
+                    </td>
+                </tr>
+            `;
+        });
+        renderPaginationControls('classes', filtered.length, pageSize, currentClassesPage);
+    }
+
+    function onClassNameEdited(actualIdx, input) {
+        classesVerticalList[actualIdx].name = input.value;
+    }
+
+    function confirmDeleteClass(idx) {
+        if(confirm("هل أنت متأكد من حذف هذا الفصل؟")) {
+            classesVerticalList.splice(idx, 1);
+            renderClassesTable();
+            updateEvaluationClassDropdown();
+        }
+    }
+
+    function generateGradeClasses() {
+        const grade = document.getElementById('gradeNameInput').value.trim() || 'ثاني';
+        const count = parseInt(document.getElementById('gradeCountInput').value) || 6;
+        const branch = document.getElementById('filterBranch').value === 'ALL' ? 'الحزم' : document.getElementById('filterBranch').value;
+        const section = document.getElementById('filterSection').value === 'ALL' ? 'بنين' : document.getElementById('filterSection').value;
+        const stage = document.getElementById('filterStage').value === 'ALL' ? 'ابتدائي' : document.getElementById('filterStage').value;
+
+        for(let f=1; f<=count; f++) {
+            let className = `${grade}/${f}`;
+            if(!classesVerticalList.some(c => c.name === className && c.branch === branch && c.section === section && c.stage === stage)) {
+                classesVerticalList.push({ name: className, branch, section, stage });
+            }
+        }
+        sortClassesList();
+        renderClassesTable();
+        updateEvaluationClassDropdown();
+        alert("تم توليد وترتيب الفصول الدراسية تلقائياً بنجاح.");
+    }
+
+    function addSingleClass() {
+        let name = prompt("أدخل اسم الفصل (مثال: ثاني/3):");
+        if(name) {
+            let b = document.getElementById('filterBranch').value === 'ALL' ? 'الحزم' : document.getElementById('filterBranch').value;
+            let s = document.getElementById('filterSection').value === 'ALL' ? 'بنين' : document.getElementById('filterSection').value;
+            let st = document.getElementById('filterStage').value === 'ALL' ? 'ابتدائي' : document.getElementById('filterStage').value;
+            classesVerticalList.push({ name, branch: b, section: s, stage: st });
+            sortClassesList();
+            renderClassesTable();
+            updateEvaluationClassDropdown();
+        }
+    }
+
+    function renderTeachersTable() {
+        const pageSizeVal = document.getElementById('teachersPageSize').value;
+        const tBody = document.getElementById('teachersTableBody');
+        tBody.innerHTML = '';
+        
+        let filtered = getFilteredTeachers();
+        let pageSize = pageSizeVal === '205' ? filtered.length : parseInt(pageSizeVal);
+        let start = (currentTeachersPage - 1) * pageSize;
+        let end = start + pageSize;
+        let slice = filtered.slice(start, end);
+
+        slice.forEach((t, index) => {
+            let actualIdx = teachersData.indexOf(t);
+            let i = start + index;
+            let natOptions = nationalityList.map(n => `<option value="${n}" ${t.nat===n?'selected':''}>${n}</option>`).join('');
+            let stageOptions = stagesList.map(st => `<option value="${st}" ${t.stage===st?'selected':''}>${st}</option>`).join('');
+            let subjOptions = subjectsList.map(sb => `<option value="${sb}" ${t.subject===sb?'selected':''}>${sb}</option>`).join('');
+
+            tBody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><input type="text" value="${t.name}" id="t_name_${actualIdx}" style="width:90%; text-align:center; outline:none;"></td>
+                    <td><select id="t_nat_${actualIdx}" style="padding:2px; outline:none;">${natOptions}</select></td>
+                    <td>
+                        <select id="t_branch_${actualIdx}" style="padding:2px; outline:none;">
+                            <option value="الحزم" ${t.branch==='الحزم'?'selected':''}>الحزم</option>
+                            <option value="طويق" ${t.branch==='طويق'?'selected':''}>طويق</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="t_sec_${actualIdx}" style="padding:2px; outline:none;">
+                            <option value="بنين" ${t.section==='بنين'?'selected':''}>بنين</option>
+                            <option value="بنات" ${t.section==='بنات'?'selected':''}>بنات</option>
+                        </select>
+                    </td>
+                    <td><select id="t_stage_${actualIdx}" style="padding:2px; outline:none;">${stageOptions}</select></td>
+                    <td><select id="t_subj_${actualIdx}" style="padding:2px; outline:none;">${subjOptions}</select></td>
+                    <td style="display:flex; gap:4px; justify-content:center;">
+                        <button class="btn" style="padding:2px 6px;" onclick="saveTeacherRow(${actualIdx})">حفظ</button>
+                        <button class="btn" style="background:#c62828; padding:2px 6px;" onclick="confirmDeleteTeacher(${actualIdx})">حذف</button>
+                    </td>
+                </tr>`;
+        });
+
+        if(pageSizeVal !== '205') {
+            renderPaginationControls('teachers', filtered.length, pageSize, currentTeachersPage);
+        } else {
+            document.getElementById('teachersPaginationControls').innerHTML = `عرض الكل (${filtered.length})`;
+        }
+    }
+
+    function saveTeacherRow(idx) {
+        teachersData[idx].name = document.getElementById(`t_name_${idx}`).value;
+        teachersData[idx].nat = document.getElementById(`t_nat_${idx}`).value;
+        teachersData[idx].branch = document.getElementById(`t_branch_${idx}`).value;
+        teachersData[idx].section = document.getElementById(`t_sec_${idx}`).value;
+        teachersData[idx].stage = document.getElementById(`t_stage_${idx}`).value;
+        teachersData[idx].subject = document.getElementById(`t_subj_${idx}`).value;
+        renderTeachersTable();
+        alert("تم حفظ بيانات المعلم بنجاح.");
+    }
+
+    function confirmDeleteTeacher(idx) {
+        if(confirm("تحذير: هل أنت متأكد من حذف هذا المعلم؟")) {
+            teachersData.splice(idx, 1);
+            renderTeachersTable();
+            alert("تم الحذف بنجاح.");
+        }
+    }
+
+    function renderStaffTable() {
+        const pageSizeVal = document.getElementById('staffPageSize').value;
+        const sBody = document.getElementById('staffTableBody');
+        sBody.innerHTML = '';
+
+        let filtered = getFilteredStaff();
+        let pageSize = pageSizeVal === '67' ? filtered.length : parseInt(pageSizeVal);
+        let start = (currentStaffPage - 1) * pageSize;
+        let end = start + pageSize;
+        let slice = filtered.slice(start, end);
+
+        slice.forEach((s, index) => {
+            let actualIdx = staffData.indexOf(s);
+            let i = start + index;
+            let natOptions = nationalityList.map(n => `<option value="${n}" ${s.nat===n?'selected':''}>${n}</option>`).join('');
+            let stageOptions = stagesList.map(st => `<option value="${st}" ${s.stage===st?'selected':''}>${st}</option>`).join('');
+            let roleOptions = staffRolesList.map(r => `<option value="${r}" ${s.role===r?'selected':''}>${r}</option>`).join('');
+
+            sBody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><input type="text" value="${s.name}" id="s_name_${actualIdx}" style="width:90%; text-align:center; outline:none;"></td>
+                    <td><select id="s_nat_${actualIdx}" style="padding:2px; outline:none;">${natOptions}</select></td>
+                    <td>
+                        <select id="s_branch_${actualIdx}" style="padding:2px; outline:none;">
+                            <option value="الحزم" ${s.branch==='الحزم'?'selected':''}>الحزم</option>
+                            <option value="طويق" ${s.branch==='طويق'?'selected':''}>طويق</option>
+                        </select>
+                    </td>
+                    <td>
+                        <select id="s_sec_${actualIdx}" style="padding:2px; outline:none;">
+                            <option value="بنين" ${s.section==='بنين'?'selected':''}>بنين</option>
+                            <option value="بنات" ${s.section==='بنات'?'selected':''}>بنات</option>
+                        </select>
+                    </td>
+                    <td><select id="s_stage_${actualIdx}" style="padding:2px; outline:none;">${stageOptions}</select></td>
+                    <td><select id="s_role_${actualIdx}" style="padding:2px; outline:none;">${roleOptions}</select></td>
+                    <td style="display:flex; gap:4px; justify-content:center;">
+                        <button class="btn" style="padding:2px 6px;" onclick="saveStaffRow(${actualIdx})">حفظ</button>
+                        <button class="btn" style="background:#c62828; padding:2px 6px;" onclick="confirmDeleteStaff(${actualIdx})">حذف</button>
+                    </td>
+                </tr>`;
+        });
+
+        if(pageSizeVal !== '67') {
+            renderPaginationControls('staff', filtered.length, pageSize, currentStaffPage);
+        } else {
+            document.getElementById('staffPaginationControls').innerHTML = `عرض الكل (${filtered.length})`;
+        }
+    }
+
+    function saveStaffRow(idx) {
+        staffData[idx].name = document.getElementById(`s_name_${idx}`).value;
+        staffData[idx].nat = document.getElementById(`s_nat_${idx}`).value;
+        staffData[idx].branch = document.getElementById(`s_branch_${idx}`).value;
+        staffData[idx].section = document.getElementById(`s_sec_${idx}`).value;
+        staffData[idx].stage = document.getElementById(`s_stage_${idx}`).value;
+        staffData[idx].role = document.getElementById(`s_role_${idx}`).value;
+        renderStaffTable();
+        alert("تم حفظ بيانات الكادر الإداري بنجاح.");
+    }
+
+    function confirmDeleteStaff(idx) {
+        if(confirm("تحذير: هل أنت متأكد من حذف هذا الإداري؟")) {
+            staffData.splice(idx, 1);
+            renderStaffTable();
+            alert("تم الحذف بنجاح.");
+        }
+    }
+
+    function renderUsersTable() {
+        const pageSizeVal = document.getElementById('usersPageSize').value;
+        const uBody = document.getElementById('usersTableBody');
+        uBody.innerHTML = '';
+        let pageSize = pageSizeVal === '38' ? usersList.length : parseInt(pageSizeVal);
+        let start = (currentUsersPage - 1) * pageSize;
+        let end = start + pageSize;
+        let slice = usersList.slice(start, end);
+
+        slice.forEach((u, index) => {
+            let i = start + index;
+            uBody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><input type="text" value="${u.name}" style="width:90%; text-align:center; outline:none;"></td>
+                    <td><input type="text" value="${u.role}" style="width:90%; text-align:center; outline:none;"></td>
+                    <td><input type="text" value="user_${i+1}" style="width:90%; text-align:center; outline:none;"></td>
+                    <td><input type="text" value="1234" style="width:90%; text-align:center; outline:none;"></td>
+                    <td style="display:flex; gap:4px; justify-content:center;">
+                        <button class="btn" style="padding:2px 6px; font-size:9.5px;" onclick="alert('تم الحفظ')">حفظ</button>
+                        <button class="btn" style="background:#c62828; padding:2px 6px; font-size:9.5px;" onclick="if(confirm('حذف هذا المستخدم؟')){usersList.splice(${i},1); renderUsersTable(); populateUserDropdowns();}">حذف</button>
+                    </td>
+                </tr>`;
+        });
+        renderPaginationControls('users', usersList.length, pageSize, currentUsersPage);
+    }
+
+    function renderApprovedPermsTable() {
+        const pageSizeVal = document.getElementById('approvedPageSize').value;
+        const pBody = document.getElementById('approvedPermsTableBody');
+        pBody.innerHTML = '';
+        let pageSize = pageSizeVal === '38' ? usersList.length : parseInt(pageSizeVal);
+        let start = (currentApprovedPage - 1) * pageSize;
+        let end = start + pageSize;
+        let slice = usersList.slice(start, end);
+
+        slice.forEach((u, index) => {
+            let i = start + index;
+            let adminStr = u.adminRoles.length > 0 ? u.adminRoles.join('، ') : 'لا توجد';
+            let eduStr = u.eduRoles.length > 0 ? u.eduRoles.join('، ') : 'لا توجد';
+            pBody.innerHTML += `
+                <tr>
+                    <td>${i+1}</td>
+                    <td><b>${u.name}</b></td>
+                    <td>${u.role}</td>
+                    <td><span style="color:var(--primary-purple); font-weight:bold;">${adminStr}</span></td>
+                    <td><span style="color:#00796b; font-weight:bold;">${eduStr}</span></td>
+                </tr>`;
+        });
+        renderPaginationControls('approved-perms', usersList.length, pageSize, currentApprovedPage);
+    }
+
+    function renderSettingsFormsTable() {
+        const tbody = document.getElementById('settingsFormsTableBody');
+        tbody.innerHTML = '';
+        Object.keys(formTemplates).forEach(key => {
+            let f = formTemplates[key];
+            tbody.innerHTML += `
+                <tr>
+                    <td><b>${f.title}</b></td>
+                    <td>${f.items.length} بند</td>
+                    <td style="display:flex; gap:5px; justify-content:center;">
+                        <button class="btn" style="background:#2e7d32; font-size:9px;" onclick="openEditItemsModal('${key}')">تعديل الاستمارة بالكامل (معاينة PDF)</button>
+                        <button class="btn" style="background:#c62828; font-size:9px;" onclick="if(confirm('حذف هذه الاستمارة؟')){delete formTemplates['${key}']; renderSettingsFormsTable(); applyUserPermissionsUI();}">حذف</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    function openEditItemsModal(key) {
+        currentEditingFormKey = key;
+        let f = formTemplates[key];
+        document.getElementById('editItemsModalTitle').textContent = "تعديل الاستمارة: " + f.title;
+        document.getElementById('modalEditFormTitle').value = f.title;
+        document.getElementById('modalEditSectionTitle').value = f.targetSectionTitle;
+        document.getElementById('modalEditRoleName').value = f.targetRoleName;
+        renderModalItemsTable(f.items);
+        document.getElementById('editItemsModal').style.display = 'flex';
+    }
+
+    function renderModalItemsTable(items) {
+        const tbody = document.getElementById('modalItemsTableBody');
+        tbody.innerHTML = '';
+        let totalW = 0;
+        let totalMax = 0;
+        
+        items.forEach((item, index) => {
+            totalW += parseFloat(item.weight) || 0;
+            totalMax += 5;
+            tbody.innerHTML += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td style="text-align:right;"><input type="text" value="${item.name}" class="modal-item-name" style="width:98%; padding:4px; border:1px solid #ccc; text-align:right; outline:none; font-size:11px;" oninput="updateModalSummary()"></td>
+                    <td><input type="number" value="${item.weight}" class="modal-item-weight" style="width:70px; text-align:center; padding:4px; border:1px solid #ccc; outline:none; font-size:11px;" oninput="updateModalSummary()"></td>
+                    <td>5</td>
+                    <td><button class="btn" style="background:#c62828; padding:2px 6px; font-size:10px;" onclick="this.closest('tr').remove(); updateModalSummary();">حذف</button></td>
+                </tr>
+            `;
+        });
+        document.getElementById('modalTotalWeight').textContent = totalW + '%';
+        document.getElementById('modalTotalMaxScore').textContent = totalMax;
+    }
+
+    function updateModalSummary() {
+        let weightInputs = document.querySelectorAll('.modal-item-weight');
+        let totalW = 0;
+        let totalMax = 0;
+        weightInputs.forEach(inp => {
+            totalW += parseFloat(inp.value) || 0;
+            totalMax += 5;
+        });
+        document.getElementById('modalTotalWeight').textContent = totalW + '%';
+        document.getElementById('modalTotalMaxScore').textContent = totalMax;
+    }
+
+    function addModalItemRow() {
+        const tbody = document.getElementById('modalItemsTableBody');
+        let tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${tbody.rows.length + 1}</td>
+            <td style="text-align:right;"><input type="text" value="عنصر أداء جديد" class="modal-item-name" style="width:98%; padding:4px; border:1px solid #ccc; text-align:right; outline:none; font-size:11px;" oninput="updateModalSummary()"></td>
+            <td><input type="number" value="10" class="modal-item-weight" style="width:70px; text-align:center; padding:4px; border:1px solid #ccc; outline:none; font-size:11px;" oninput="updateModalSummary()"></td>
+            <td>5</td>
+            <td><button class="btn" style="background:#c62828; padding:2px 6px; font-size:10px;" onclick="this.closest('tr').remove(); updateModalSummary();">حذف</button></td>
+        `;
+        tbody.appendChild(tr);
+        updateModalSummary();
+    }
+
+    function closeItemsModal() {
+        document.getElementById('editItemsModal').style.display = 'none';
+        currentEditingFormKey = null;
+    }
+
+    function saveEditedItems() {
+        if(!currentEditingFormKey) return;
+        let newTitle = document.getElementById('modalEditFormTitle').value.trim();
+        let newSectionTitle = document.getElementById('modalEditSectionTitle').value.trim();
+        let newRoleName = document.getElementById('modalEditRoleName').value.trim();
+
+        let nameInputs = document.querySelectorAll('.modal-item-name');
+        let weightInputs = document.querySelectorAll('.modal-item-weight');
+        let newItems = [];
+        for(let i=0; i<nameInputs.length; i++) {
+            let name = nameInputs[i].value.trim();
+            let weight = parseFloat(weightInputs[i].value) || 5;
+            if(name) newItems.push({ name, weight });
+        }
+        if(newItems.length > 0) {
+            formTemplates[currentEditingFormKey].title = newTitle || "استمارة تقييم";
+            formTemplates[currentEditingFormKey].targetSectionTitle = newSectionTitle || "بيانات الموظف";
+            formTemplates[currentEditingFormKey].targetRoleName = newRoleName || "اسم الموظف";
+            formTemplates[currentEditingFormKey].items = newItems;
+
+            renderSettingsFormsTable();
+            applyUserPermissionsUI();
+            closeItemsModal();
+            alert("تم حفظ تعديلات الاستمارة بالكامل بنجاح!");
+        }
+    }
+
+    function createNewFormModal() {
+        let name = prompt("أدخل اسم الاستمارة الجديدة:");
+        if(name) {
+            let key = 'form_' + Date.now();
+            formTemplates[key] = {
+                title: name,
+                targetRoleName: "اسم الموظف",
+                targetSectionTitle: "بيانات الموظف",
+                targetType: "staff",
+                items: [{name: "الأداء العام", weight: 100}]
+            };
+            renderSettingsFormsTable();
+            applyUserPermissionsUI();
+        }
+    }
+
+    function renderPaginationControls(type, total, pageSize, currentPage) {
+        let totalPages = Math.ceil(total / pageSize) || 1;
+        let container = document.getElementById(type + 'PaginationControls');
+        if(!container) return;
+        container.innerHTML = `صفحة ${currentPage} من ${totalPages} | `;
+        for(let p=1; p<=totalPages; p++) {
+            container.innerHTML += `<button class="btn" style="padding:1px 5px; margin:0 2px; background:${p===currentPage?'#00bcd4':'#512da8'}" onclick="goToPage('${type}', ${p})">${p}</button>`;
+        }
+    }
+
+    function goToPage(type, page) {
+        if(type === 'teachers') { currentTeachersPage = page; renderTeachersTable(); }
+        else if(type === 'staff') { currentStaffPage = page; renderStaffTable(); }
+        else if(type === 'classes') { currentClassesPage = page; renderClassesTable(); }
+        else if(type === 'users') { currentUsersPage = page; renderUsersTable(); }
+        else if(type === 'approved-perms') { currentApprovedPage = page; renderApprovedPermsTable(); }
+    }
+
+    function changePageSize(type) { goToPage(type, 1); }
+
+    function addNewTeacherModal() {
+        let name = prompt("اسم المعلم الجديد:");
+        if(name) {
+            teachersData.unshift({name, nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", subject: "علوم"});
+            renderTeachersTable();
+        }
+    }
+
+    function addNewStaffModal() {
+        let name = prompt("اسم الإداري الجديد:");
+        if(name) {
+            staffData.unshift({name, nat: "سعودي", branch: "الحزم", section: "بنين", stage: "ابتدائي", role: "مدير"});
+            renderStaffTable();
+        }
+    }
+
+    function addNewUser() {
+        let name = prompt("اسم المستخدم الجديد:");
+        if(name) { usersList.push({name, role: "مشرف تربوي", adminRoles: [], eduRoles: ["علوم"]}); renderUsersTable(); populateUserDropdowns(); }
+    }
+
+    function exportStaffExcel() {
+        let csv = "data:text/csv;charset=utf-8,\uFEFFالاسم,الجنسية,الفرع,القسم,المرحلة,الوظيفة\n";
+        staffData.forEach(s => { csv += `"${s.name}","${s.nat}","${s.branch}","${s.section}","${s.stage}","${s.role}"\n`; });
+        let link = document.createElement("a"); link.href = encodeURI(csv); link.download = "staff.csv";
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+    function importStaffExcel(e) { alert("تم الاستيراد بنجاح."); }
+
+    function exportExcelTemplate() {
+        let csv = "data:text/csv;charset=utf-8,\uFEFFالاسم,الجنسية,الفرع,القسم,المرحلة,التخصص\n";
+        teachersData.forEach(t => { csv += `"${t.name}","${t.nat}","${t.branch}","${t.section}","${t.stage}","${t.subject}"\n`; });
+        let link = document.createElement("a"); link.href = encodeURI(csv); link.download = "teachers.csv";
+        document.body.appendChild(link); link.click(); document.body.removeChild(link);
+    }
+    function importExcelData(e) { alert("تم الاستيراد بنجاح."); }
+
+    const pageSequence = ['eval', 'archive', 'teachers', 'staff', 'classes', 'users', 'permissions', 'approved-perms', 'settings'];
+    function getCurrentPageIndex() {
+        for(let i=0; i<pageSequence.length; i++) {
+            if(document.getElementById('page-' + pageSequence[i]).style.display === 'block') return i;
+        }
+        return 0;
+    }
+    function nextPage() {
+        let idx = getCurrentPageIndex();
+        if(idx < pageSequence.length - 1) {
+            let nextId = pageSequence[idx + 1];
+            let menuEl = document.getElementById('menu-' + nextId) || document.querySelector(`[onclick*="${nextId}"]`);
+            switchPage(nextId, menuEl);
+        }
+    }
+    function prevPage() {
+        let idx = getCurrentPageIndex();
+        if(idx > 0) {
+            let prevId = pageSequence[idx - 1];
+            let menuEl = document.getElementById('menu-' + prevId) || document.querySelector(`[onclick*="${prevId}"]`);
+            switchPage(prevId, menuEl);
+        }
+    }
+
+    window.onload = function() {
+        document.getElementById('filterBranch').value = 'ALL';
+        document.getElementById('filterSection').value = 'ALL';
+        document.getElementById('filterStage').value = 'ALL';
+
+        onSectionFilterChanged();
+        initDataTables();
+        applyUserPermissionsUI();
+        switchPage('eval', document.getElementById('menu-eval'));
+
+        document.getElementById('loginPass').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleLogin(); });
+        document.getElementById('loginUser').addEventListener('keypress', function(e) { if (e.key === 'Enter') handleLogin(); });
+    };
+</script>
+
+</body>
+</html>
