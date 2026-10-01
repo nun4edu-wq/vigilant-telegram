@@ -98,20 +98,12 @@
         .card {
             background: white; padding: 15px 20px; border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 10px;
-            width: 100%;
-            margin-left: auto; margin-right: auto;
-            overflow-x: auto;
+            width: 100%; margin-left: auto; margin-right: auto; overflow-x: auto;
         }
         .single-eval-form-wrapper {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 2px dashed #ccc;
+            margin-bottom: 25px; padding-bottom: 15px; border-bottom: 2px dashed #ccc;
         }
-        .single-eval-form-wrapper:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+        .single-eval-form-wrapper:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
 
         .section-title {
             background-color: #f3e5f5; color: var(--primary-purple); padding: 8px 10px;
@@ -254,10 +246,8 @@
     <button class="mobile-menu-toggle" onclick="toggleMobileMenu()">☰ القائمة والفلاتر</button>
 
     <div class="action-bar">
-        <!-- الجملة أصبحت طرفية في أقصى اليمين -->
         <span class="topbar-credit-text">برمجة الشؤون التعليمية بمدارس الشارقة الأهلية</span>
 
-        <!-- الأزرار في الوسط -->
         <div class="nav-center-sec">
             <button class="btn" onclick="switchPage('eval', document.getElementById('menu-eval'))">الرئيسية</button>
             <button class="btn" onclick="prevPage()">سابق</button>
@@ -267,7 +257,6 @@
             <button class="btn" style="background: #c62828;" onclick="logout()">خروج</button>
         </div>
 
-        <!-- الشعار في أقصى اليسار -->
         <div class="nav-left-sec">
             <span style="font-size: 10.5px; font-weight: bold; color: #fff;">وصلنا... ومكملين</span>
             <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار الحملة" style="height: 38px; width: auto;">
@@ -488,7 +477,6 @@
                             <td colspan="5" style="text-align: center; background: #fff; padding: 8px;">
                                 <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
                                     <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار المدرسة" style="height: 40px; width: auto;">
-                                    <!-- عنوان الاستمارة قابل للتعديل الحقيقي -->
                                     <input type="text" id="modalEditFormTitle" style="color: var(--primary-purple); font-size: 13px; font-weight: bold; text-align: center; border: 1px dashed #ccc; width: 50%; padding: 4px; outline: none; background: #fff;">
                                     <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار الحملة" style="height: 38px; width: auto;">
                                 </div>
@@ -890,45 +878,37 @@
             targetType: "teacher",
             items: [
                 {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10},
-                {name: "التفاعل مع أولياء الأمور", weight: 10}, {name: "التنويع في إستراتيجيات التدريس", weight: 10},
+                {name: "التفاعل مع أولياء الأمور", weight: 10}, {name: "التنويع في استراتيجيات التدريس", weight: 10},
                 {name: "تحسين نتائج المتعلمين", weight: 10}, {name: "إعداد وتنفيذ خطة التعلم", weight: 10},
                 {name: "توظيف تقنيات ووسائل التعلم المناسبة", weight: 10}, {name: "تهيئة بيئة تعليمية", weight: 5},
                 {name: "الإدارة الصفية", weight: 5}, {name: "تحليل نتائج المتعلمين وتشخيص مستوياتهم", weight: 10},
-                {name: "تنوع أساليب التقويم", weight: 10}
+                {name: "تنويع أساليب التقويم", weight: 10}
             ]
         },
-        manager: {
-            title: "استمارة تقييم أداء مدير المدرسة",
-            targetRoleName: "اسم مدير المدرسة",
-            targetSectionTitle: "بيانات مدير المدرسة",
-            targetType: "manager",
+        activity: {
+            title: "استمارة تقييم أداء رائد النشاط",
+            targetRoleName: "اسم رائد النشاط",
+            targetSectionTitle: "بيانات رائد النشاط",
+            targetType: "activity",
             items: [
-                {name: "أداء الواجبات الوظيفية", weight: 5}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
-                {name: "مرن وقادر على تنفيذ أعماله في ظل ظروف العمل", weight: 5}, {name: "يدعم ويشارك في المبادرات النوعية", weight: 10},
-                {name: "يتخذ إجراءات تربوية تحقق الانضباط المدرسي", weight: 5}, {name: "يدير الموارد في المدرسة بكفاءة", weight: 5},
-                {name: "أعد خطة للتطوير المهني", weight: 5}, {name: "يقدم التغذية الراجعة ويتابع مؤشرات الأداء", weight: 5},
-                {name: "يدعم تنفيذ برامج التطوير المهني", weight: 5}, {name: "يُقيم أداء منسوبي المدرسة", weight: 5},
-                {name: "ينفذ إجراءات علمية لتحسين نتائج التعلم", weight: 5}, {name: "يُسهم في تحسين مستوى أداء المدرسة", weight: 10},
-                {name: "يُعد الخطط المدرسية اللازمة", weight: 5}, {name: "يتابع تنفيذ الخطط المدرسية", weight: 5},
-                {name: "يُهيئ الفرص والإمكانات الداعمة للأنشطة", weight: 5}, {name: "يوظف المنصات الرقمية وتطبيقاتها المعتمدة", weight: 5},
-                {name: "يتابع تعزيز السلوك الإيجابي للطلاب", weight: 5}, {name: "يُهيئ بيئةً مدرسية آمنةً ومحفزةً", weight: 5}
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 10},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 5}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
+                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
+                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "إعداد خطة مزمنة للنشاط الطلابي", weight: 10},
+                {name: "تهيئة البيئة المدرسية للبرامج", weight: 5}, {name: "يدعم المتعلمين وفق احتياجاتهم", weight: 5}, {name: "يحفز المتعلمين على المشاركة", weight: 10}
             ]
         },
-        agent: {
-            title: "استمارة تقييم أداء وكيل المدرسة",
-            targetRoleName: "اسم وكيل المدرسة",
-            targetSectionTitle: "بيانات وكيل المدرسة",
-            targetType: "agent",
+        health: {
+            title: "استمارة تقييم أداء موجه صحي",
+            targetRoleName: "اسم الموجه الصحي",
+            targetSectionTitle: "بيانات الموجه الصحي",
+            targetType: "health",
             items: [
-                {name: "أداء الواجبات الوظيفية", weight: 5}, {name: "التفاعل مع المجتمع المهني", weight: 5}, {name: "التفاعل مع أولياء الأمور", weight: 5},
-                {name: "مرن وقادر على تنفيذ أعماله في ظل ظروف العمل", weight: 5}, {name: "يدعم ويشارك في المبادرات النوعية", weight: 10},
-                {name: "يتخذ إجراءات تربوية تحقق الانضباط المدرسي", weight: 5}, {name: "يدير الموارد في المدرسة بكفاءة", weight: 5},
-                {name: "يشارك في إعداد خطة للتطوير المهني", weight: 5}, {name: "يقدم التغذية الراجعة ويتابع مؤشرات الأداء", weight: 5},
-                {name: "يدعم تنفيذ برامج التطوير المهني", weight: 5}, {name: "يُقيم أداء منسوبي المدرسة", weight: 5},
-                {name: "ينفذ إجراءات علمية لتحسين نتائج التعلم", weight: 5}, {name: "يُسهم في تحسين مستوى أداء المدرسة", weight: 5},
-                {name: "يشارك في إعداد الخطط المدرسية", weight: 5}, {name: "يتابع تنفيذ الخطط المدرسية", weight: 5},
-                {name: "يُهيئ الفرص الداعمة لمشاركة الطلاب", weight: 5}, {name: "يوظف المنصات الرقمية وتطبيقاتها المعتمدة", weight: 5},
-                {name: "يُتابع تعزيز السلوك الإيجابي للطلاب", weight: 5}, {name: "يُهيئ بيئةً مدرسية آمنةً ومحفزةً للتعلم", weight: 5}
+                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 5},
+                {name: "التنويع في إستراتيجيات التدريس", weight: 10}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
+                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
+                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "تنفيذ الخطة المشتركة للبرامج الصحية", weight: 15},
+                {name: "حصر الحالات الصحية للمتعلمين", weight: 5}, {name: "تهيئة البيئة الصحية المدرسية", weight: 10}
             ]
         },
         kg: {
@@ -959,19 +939,6 @@
                 {name: "يعد تقارير دورية عن حالة الأجهزة", weight: 10}
             ]
         },
-        activity: {
-            title: "استمارة تقييم أداء رائد النشاط",
-            targetRoleName: "اسم رائد النشاط",
-            targetSectionTitle: "بيانات رائد النشاط",
-            targetType: "activity",
-            items: [
-                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 10},
-                {name: "التنويع في إستراتيجيات التدريس", weight: 5}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
-                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
-                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "إعداد خطة مزمنة للنشاط الطلابي", weight: 10},
-                {name: "تهيئة البيئة المدرسية للبرامج", weight: 5}, {name: "يدعم المتعلمين وفق احتياجاتهم", weight: 5}, {name: "يحفز المتعلمين على المشاركة", weight: 10}
-            ]
-        },
         counselor: {
             title: "استمارة تقييم أداء الموجه الطلابي",
             targetRoleName: "اسم الموجه الطلابي",
@@ -983,19 +950,6 @@
                 {name: "يُصنف الحالات ويُقدم الدعم", weight: 10}, {name: "يُعزز القيم والسلوكيات", weight: 10}, {name: "يُقدم التدخلات النفسية والاجتماعية", weight: 10},
                 {name: "يُساعد المتعلمين على التخطيط المهني", weight: 5}, {name: "يُعزز التفوق الدراسي", weight: 5}, {name: "يقدم تدخلات للمتأخرين دراسياً", weight: 5},
                 {name: "توعية المتعلمين بقواعد السلوك", weight: 5}
-            ]
-        },
-        health: {
-            title: "استمارة تقييم أداء موجه صحي",
-            targetRoleName: "اسم الموجه الصحي",
-            targetSectionTitle: "بيانات الموجه الصحي",
-            targetType: "health",
-            items: [
-                {name: "أداء الواجبات الوظيفية", weight: 10}, {name: "التفاعل مع المجتمع المهني", weight: 10}, {name: "التفاعل مع أولياء الأمور", weight: 5},
-                {name: "التنويع في إستراتيجيات التدريس", weight: 10}, {name: "تحسين نتائج المتعلمين", weight: 5}, {name: "إعداد وتنفيذ خطة التعلم", weight: 5},
-                {name: "توظيف تقنيات ووسائل التعلم", weight: 5}, {name: "تهيئة بيئة تعليمية", weight: 5}, {name: "الإدارة الصفية", weight: 5},
-                {name: "تحليل نتائج المتعلمين", weight: 5}, {name: "تنوع أساليب التقويم", weight: 5}, {name: "تنفيذ الخطة المشتركة للبرامج الصحية", weight: 15},
-                {name: "حصر الحالات الصحية للمتعلمين", weight: 5}, {name: "تهيئة البيئة الصحية المدرسية", weight: 10}
             ]
         }
     };
@@ -1132,16 +1086,15 @@
 
     function generateSingleFormHTML(template) {
         let itemsHtml = '';
-        let totalMaxSumCalc = 0;
+        let totalMaxScore = template.items.length * 5;
         template.items.forEach((item, index) => {
-            totalMaxSumCalc += 5;
             itemsHtml += `
                 <tr>
                     <td>${index + 1}</td>
                     <td class="text-right" style="font-weight:600;">${item.name}</td>
                     <td>${item.weight}%</td>
                     <td>5</td>
-                    <td><input type="number" step="0.5" min="0" max="5" value="5" class="score-input" data-weight="${item.weight}" onfocus="onScoreFocus(this)" onblur="onScoreBlur(this)" oninput="validateAndCalculate(this)"></td>
+                    <td><input type="number" step="any" min="0" max="5" value="5" class="score-input" data-weight="${item.weight}" onfocus="onScoreFocus(this)" onblur="onScoreBlur(this)" oninput="validateAndCalculate(this)"></td>
                     <td style="text-align:right;"><input type="text" class="item-note-input" style="width: 99%; border:none; outline:none; background:transparent; text-align:right;" placeholder=""></td>
                 </tr>
             `;
@@ -1231,9 +1184,9 @@
                         <tfoot>
                             <tr>
                                 <td colspan="3" style="background: #f3e5f5; font-weight: bold; color: var(--primary-purple); text-align: center; border: 1px solid var(--primary-purple);">المجموع الكلي</td>
-                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualMaxSum">${totalMaxSumCalc}</td>
-                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualSum">${totalMaxSumCalc}</td>
-                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple); font-size: 10.5px;">التقدير العام للأداء = <span class="finalPercentage">100.00%</span></td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualMaxSum">${totalMaxScore}</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple);" class="actualSum">${totalMaxScore}</td>
+                                <td style="background: #e8f5e9; font-weight: bold; color: #2e7d32; text-align: center; border: 1px solid var(--primary-purple); font-size: 10.5px;">التقدير العام للأداء = <span class="finalPercentage">100%</span></td>
                             </tr>
                         </tfoot>
                     </table>
@@ -1277,7 +1230,7 @@
     function onScoreBlur(input) {
         if(isViewOnlyMode) return;
         if(input.value.trim() === "") {
-            input.value = lastFocusedScoreValue;
+            input.value = lastFocusedScoreValue !== "" ? lastFocusedScoreValue : "5";
             calculateScoresForWrapper(input.closest('.single-eval-form-wrapper'));
         }
     }
@@ -1344,7 +1297,7 @@
         if(isViewOnlyMode) return;
         let val = parseFloat(input.value);
         if (val > 5) {
-            alert("لا يمكن أن تزيد الدرجة المكتسبة عن 5 (الدرجة الأعلى)");
+            alert("لا يمكن أن تزيد الدرجة المكتسبة عن 5");
             input.value = 5;
         } else if (val < 0) {
             input.value = 0;
@@ -1353,30 +1306,32 @@
     }
 
     function calculateScoresForWrapper(wrapper) {
-        let totalWeighted = 0;
-        let rawSum = 0;
-        let totalMaxSum = 0;
+        let totalWeightedScore = 0;
+        let totalMaxScore = 0;
         const inputs = wrapper.querySelectorAll('.score-input');
         
         inputs.forEach(input => {
-            let val = parseFloat(input.value) || 0;
-            if(val > 5) val = 5;
-            
-            rawSum += val;
-            totalMaxSum += 5;
+            let val = parseFloat(input.value);
+            if (isNaN(val)) val = 0;
+            if (val > 5) { val = 5; input.value = 5; }
+            if (val < 0) { val = 0; input.value = 0; }
 
             let weight = parseFloat(input.getAttribute('data-weight')) || 0;
-            let wScore = (val / 5) * weight;
-            totalWeighted += wScore;
+            
+            // المعادلة الدقيقة المطابقة لحاسبتك المعتمدة
+            let weightedScore = (val / 5) * weight;
+            totalWeightedScore += weightedScore;
+            totalMaxScore += 5;
         });
 
-        if(totalWeighted > 100) totalWeighted = 100;
+        let finalAcquiredScore = totalWeightedScore * (totalMaxScore / 100);
+
+        let formattedScore = Number(finalAcquiredScore.toFixed(2));
+        let formattedPercentage = Number(totalWeightedScore.toFixed(2));
         
-        let formattedSum = Number.isInteger(rawSum) ? rawSum : rawSum.toFixed(2);
-        
-        wrapper.querySelector('.actualMaxSum').textContent = totalMaxSum;
-        wrapper.querySelector('.actualSum').textContent = formattedSum;
-        wrapper.querySelector('.finalPercentage').textContent = totalWeighted.toFixed(2) + '%';
+        wrapper.querySelector('.actualMaxSum').textContent = totalMaxScore;
+        wrapper.querySelector('.actualSum').textContent = formattedScore;
+        wrapper.querySelector('.finalPercentage').textContent = formattedPercentage + '%';
     }
 
     function clearEvaluationForm() {
@@ -2091,11 +2046,11 @@
         const tbody = document.getElementById('modalItemsTableBody');
         tbody.innerHTML = '';
         let totalW = 0;
-        let totalMax = 0;
+        let totalMax = items.length * 5;
         
         items.forEach((item, index) => {
-            totalW += parseFloat(item.weight) || 0;
-            totalMax += 5;
+            let w = parseFloat(item.weight) || 0;
+            totalW += w;
             tbody.innerHTML += `
                 <tr>
                     <td>${index + 1}</td>
@@ -2107,19 +2062,17 @@
             `;
         });
         document.getElementById('modalTotalWeight').textContent = totalW + '%';
-        document.getElementById('modalTotalMaxScore').textContent = totalMax;
+        document.getElementById('modalTotalMaxScore').textContent = items.length * 5;
     }
 
     function updateModalSummary() {
         let weightInputs = document.querySelectorAll('.modal-item-weight');
         let totalW = 0;
-        let totalMax = 0;
         weightInputs.forEach(inp => {
             totalW += parseFloat(inp.value) || 0;
-            totalMax += 5;
         });
         document.getElementById('modalTotalWeight').textContent = totalW + '%';
-        document.getElementById('modalTotalMaxScore').textContent = totalMax;
+        document.getElementById('modalTotalMaxScore').textContent = weightInputs.length * 5;
     }
 
     function addModalItemRow() {
