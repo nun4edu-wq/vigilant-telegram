@@ -35,7 +35,7 @@
         }
 
         .login-box {
-            background: white; padding: 25px 30px; border-radius: 10px; width: 400px;
+            background: white; padding: 25px 30px; border-radius: 10px; width: 90%; max-width: 400px;
             box-shadow: 0 15px 30px rgba(0,0,0,0.4); text-align: center;
         }
         .login-school-logo { max-width: 140px; height: auto; object-fit: contain; margin-bottom: 12px; }
@@ -57,6 +57,7 @@
         aside.sidebar {
             width: var(--sidebar-width); background-color: var(--purple-dark); color: white;
             display: flex; flex-direction: column; flex-shrink: 0; z-index: 100; overflow-y: auto;
+            transition: transform 0.3s ease;
         }
 
         .sidebar-brand { padding: 15px 10px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
@@ -82,7 +83,7 @@
             font-size: 0.75rem; background-color: rgba(255,255,255,0.95); color: #000;
         }
 
-        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; width: 100%; }
 
         header.topbar {
             background-color: var(--purple-header); color: white; padding: 8px 15px;
@@ -111,27 +112,33 @@
             font-size: 0.85rem; font-weight: 800; color: var(--purple-dark);
             margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
         }
-        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; }
         .filter-item { display: flex; flex-direction: column; gap: 3px; }
         .filter-item label { font-size: 0.73rem; font-weight: 700; color: #333; }
-        .filter-item select, .filter-item input { padding: 5px 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 0.8rem; background-color: #FFF; }
+        .filter-item select, .filter-item input { padding: 5px 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 0.8rem; background-color: #FFF; width: 100%; }
 
         .btn-action-excel {
             background-color: var(--btn-green); color: white; border: none; padding: 6px 12px;
             border-radius: 4px; font-weight: 700; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
         }
+        .btn-save-data {
+            background-color: var(--accent-yellow); color: #000; border: none; padding: 6px 14px;
+            border-radius: 4px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-save-data:hover { background-color: #e0a800; }
+
         .btn-current-week {
             background-color: var(--btn-blue); color: white; border: none; padding: 4px 10px;
             border-radius: 4px; font-weight: 700; font-size: 0.78rem; cursor: pointer;
         }
 
-        .table-container { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow-x: auto; margin-bottom: 15px; padding: 10px; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: center; }
+        .table-container { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow-x: auto; margin-bottom: 15px; padding: 10px; width: 100%; -webkit-overflow-scrolling: touch; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: center; min-width: 600px; }
         th { background-color: var(--purple-dark); color: white; padding: 8px; font-weight: 700; border: 1px solid rgba(255,255,255,0.15); white-space: nowrap; }
         td { padding: 6px 8px; border: 1px solid #E2E8F0; vertical-align: middle; height: 40px; white-space: nowrap; }
         tr:nth-child(even) { background-color: #F8FAFC; }
 
-        .stats-table { width: 100%; border-collapse: collapse; text-align: center; margin-top: 10px; font-size: 0.78rem; }
+        .stats-table { width: 100%; border-collapse: collapse; text-align: center; margin-top: 10px; font-size: 0.78rem; min-width: 600px; }
         .stats-table th { background-color: var(--accent-yellow); color: #000; padding: 6px; font-weight: 800; }
         .stats-table td { padding: 6px; border: 1px solid #E2E8F0; font-weight: bold; }
         .discipline-row { background-color: #E8F5E9; color: #1B5E20; }
@@ -149,7 +156,7 @@
         .btn-template { background: var(--btn-blue); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
 
         .pagination-container {
-            display: flex; justify-content: center; align-items: center; gap: 6px; margin: 15px 0 5px 0;
+            display: flex; justify-content: center; align-items: center; gap: 6px; margin: 15px 0 5px 0; flex-wrap: wrap;
         }
         .page-btn {
             background-color: #FFF; border: 1px solid var(--border-color); color: var(--purple-dark);
@@ -163,6 +170,15 @@
         }
         footer.app-footer {
             text-align: center; padding: 8px; font-size: 0.72rem; color: #666; background: #FFF; border-top: 1px solid var(--border-color); margin-top: auto;
+        }
+
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: auto; }
+            aside.sidebar { width: 100%; height: auto; position: relative; }
+            .main-wrapper { height: auto; overflow: visible; }
+            .filter-row { grid-template-columns: 1fr; }
+            .topbar { flex-direction: column; align-items: flex-start; }
+            .topbar-right-nav { width: 100%; justify-content: space-between; margin-top: 5px; }
         }
     </style>
 </head>
@@ -196,8 +212,8 @@
         </div>
         <ul class="sidebar-menu">
             <li><a href="#" class="active" onclick="goHomeMain();"><span>📊</span> لوحة ترتيب الأقسام</a></li>
-            <li id="menu-perms-li" style="display:block;"><a href="#" onclick="showView('view-perms', this)"><span>🔑</span> إدارة الصلاحيات الاستثنائية</a></li>
-            <li id="menu-users-li" style="display:block;"><a href="#" onclick="showView('view-users', this)"><span>👤</span> إدارة المستخدمين</a></li>
+            <li id="menu-perms-li" style="display:none;"><a href="#" onclick="showView('view-perms', this)"><span>🔑</span> إدارة الصلاحيات الاستثنائية</a></li>
+            <li id="menu-users-li" style="display:none;"><a href="#" onclick="showView('view-users', this)"><span>👤</span> إدارة المستخدمين</a></li>
         </ul>
 
         <div class="sidebar-filters" id="sidebar-filters-box" style="display:block;">
@@ -253,7 +269,10 @@
             <div id="view-main">
                 <div class="view-title">
                     <span id="main-view-heading">لوحة ترتيب الأقسام والمتابعة</span>
-                    <button class="btn-action-excel" onclick="exportToExcel()">📊 تصدير البيانات إلى Excel</button>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button id="btn-save-global" class="btn-save-data" onclick="manualSaveData()">💾 حفظ البيانات</button>
+                        <button class="btn-action-excel" onclick="exportToExcel()">📊 تصدير إلى Excel</button>
+                    </div>
                 </div>
 
                 <div class="filter-card">
@@ -286,7 +305,7 @@
                 </div>
 
                 <div id="alert-banner" style="display:none; background:#FFF3CD; color:#856404; padding:10px; border-radius:4px; margin-bottom:10px; font-weight:bold; font-size:0.8rem; border:1px solid #FFEEBA;">
-                    ⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً أو لاحقاً. وضع التعديل مقفل (للقراءة فقط) بناءً على الصلاحيات.
+                    ⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً. وضع التعديل مقفل (للقراءة فقط).
                 </div>
 
                 <div id="dashboardView" style="display:block;" class="table-container">
@@ -367,16 +386,16 @@
                 </div>
 
                 <div id="schoolTableView" style="display:none;" class="table-container">
-                    <button class="top-nav-btn" style="background:var(--purple-dark); margin-bottom:10px;" onclick="backToDashboard()">⬅ العودة للوحة ترتيب الأقسام</button>
+                    <button id="btn-back-dash" class="top-nav-btn" style="background:var(--purple-dark); margin-bottom:10px;" onclick="backToDashboard()">⬅ العودة لوحة الترتيب</button>
                     
                     <div id="school-action-box" style="background:#F8FAFC; padding:10px; border-radius:4px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border:1px dashed var(--purple-dark);">
-                        <div style="display:flex; gap:6px; align-items:center;">
+                        <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                             <span style="font-weight:bold; color:var(--purple-dark); font-size:0.8rem;">➕ إضافة فصل:</span>
                             <input type="text" id="newClassNameInput" placeholder="اسم الفصل (مثال: ثالث/2)" style="padding:4px; font-size:0.8rem; width:130px; border:1px solid #CCC; border-radius:4px;">
                             <input type="number" id="newClassStudentsInput" placeholder="الطلاب" value="25" min="1" style="padding:4px; font-size:0.8rem; width:70px; border:1px solid #CCC; border-radius:4px;">
                             <button class="btn-add" onclick="addNewClassToSchool()">إضافة فصل</button>
                         </div>
-                        <div style="display:flex; gap:6px;">
+                        <div style="display:flex; gap:6px; flex-wrap:wrap;">
                             <button class="btn-template" onclick="exportEmptyTemplateExcel()">📥 تحميل قالب فارغ</button>
                             <label class="btn-template" style="cursor:pointer; background:var(--btn-green); margin:0;">
                                 📤 استيراد من إكسل <input type="file" id="excelImportFile" accept=".xlsx, .xls" style="display:none;" onchange="importSchoolClassesFromExcel(event)">
@@ -548,22 +567,23 @@
             ]
         };
 
-        // تحميل البيانات المحفوظة تلقائياً أو استخدام الافتراضية
+        const currentActiveWeekCode = 't1_w7_6';
+
         let schoolsData = JSON.parse(localStorage.getItem('sharjah_schools_data')) || [
-            { id: 'h_b_p', branch: 'الحزم', section: 'بنين', grade: 'ابتدائي', name: 'الحزم - بنين - ابتدائي', classes: [{name:'أول/1', students: 25}, {name:'ثاني/1', students: 28}, {name:'ثالث/1', students: 26}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_b_m', branch: 'الحزم', section: 'بنين', grade: 'متوسط', name: 'الحزم - بنين - متوسط', classes: [{name:'أول متوسط/1', students: 30}, {name:'ثاني متوسط/1', students: 28}], absent: {sun:1, mon:0, tue:0, wed:1, thu:0} },
-            { id: 'h_b_s', branch: 'الحزم', section: 'بنين', grade: 'ثانوي', name: 'الحزم - بنين - ثانوي', classes: [{name:'أول ثانوي/1', students: 32}, {name:'ثاني ثانوي/1', students: 29}], absent: {sun:0, mon:1, tue:0, wed:0, thu:1} },
-            { id: 'h_g_k', branch: 'الحزم', section: 'بنات', grade: 'رياض أطفال', name: 'الحزم - بنات - رياض أطفال', classes: [{name:'روضة أولى', students: 20}, {name:'روضة ثانية', students: 22}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_g_p', branch: 'الحزم', section: 'بنات', grade: 'ابتدائي', name: 'الحزم - بنات - ابتدائي', classes: [{name:'أول/1 بنات', students: 24}, {name:'ثاني/1 بنات', students: 25}], absent: {sun:1, mon:0, tue:1, wed:0, thu:0} },
-            { id: 'h_g_m', branch: 'الحزم', section: 'بنات', grade: 'متوسط', name: 'الحزم - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات', students: 29}, {name:'ثاني متوسط/1 بنات', students: 27}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_g_s', branch: 'الحزم', section: 'بنات', grade: 'ثانوي', name: 'الحزم - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات', students: 31}, {name:'ثاني ثانوي/1 بنات', students: 30}], absent: {sun:0, mon:1, tue:0, wed:1, thu:0} },
-            { id: 't_b_p', branch: 'طويق', section: 'بنين', grade: 'ابتدائي', name: 'طويق - بنين - ابتدائي', classes: [{name:'أول/1 طويق', students: 26}, {name:'ثاني/1 طويق', students: 25}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_b_m', branch: 'طويق', section: 'بنين', grade: 'متوسط', name: 'طويق - بنين - متوسط', classes: [{name:'أول متوسط/1 طويق', students: 28}, {name:'ثاني متوسط/1 طويق', students: 26}], absent: {sun:1, mon:1, tue:0, wed:0, thu:0} },
-            { id: 't_b_s', branch: 'طويق', section: 'بنين', grade: 'ثانوي', name: 'طويق - بنين - ثانوي', classes: [{name:'أول ثانوي/1 طويق', students: 30}, {name:'ثاني ثانوي/1 طويق', students: 28}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_k', branch: 'طويق', section: 'بنات', grade: 'رياض أطفال', name: 'طويق - بنات - رياض أطفال', classes: [{name:'روضة/1 طويق', students: 18}, {name:'روضة/2 طويق', students: 20}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_p', branch: 'طويق', section: 'بنات', grade: 'ابتدائي', name: 'طويق - بنات - ابتدائي', classes: [{name:'أول/1 بنات طويق', students: 22}, {name:'ثاني/1 بنات طويق', students: 24}], absent: {sun:0, mon:0, tue:1, wed:0, thu:0} },
-            { id: 't_g_m', branch: 'طويق', section: 'بنات', grade: 'متوسط', name: 'طويق - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات طويق', students: 27}, {name:'ثاني متوسط/1 بنات طويق', students: 25}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_s', branch: 'طويق', section: 'بنات', grade: 'ثانوي', name: 'طويق - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات طويق', students: 29}, {name:'ثاني ثانوي/1 بنات طويق', students: 28}], absent: {sun:0, mon:0, tue:0, wed:1, thu:0} }
+            { id: 'h_b_p', branch: 'الحزم', section: 'بنين', grade: 'ابتدائي', name: 'الحزم - بنين - ابتدائي', classes: [{name:'أول/1', students: 25}, {name:'ثاني/1', students: 28}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_b_m', branch: 'الحزم', section: 'بنين', grade: 'متوسط', name: 'الحزم - بنين - متوسط', classes: [{name:'أول متوسط/1', students: 30}], absent: {sun:1, mon:0, tue:0, wed:1, thu:0} },
+            { id: 'h_b_s', branch: 'الحزم', section: 'بنين', grade: 'ثانوي', name: 'الحزم - بنين - ثانوي', classes: [{name:'أول ثانوي/1', students: 32}], absent: {sun:0, mon:1, tue:0, wed:0, thu:1} },
+            { id: 'h_g_k', branch: 'الحزم', section: 'بنات', grade: 'رياض أطفال', name: 'الحزم - بنات - رياض أطفال', classes: [{name:'روضة أولى', students: 20}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_g_p', branch: 'الحزم', section: 'بنات', grade: 'ابتدائي', name: 'الحزم - بنات - ابتدائي', classes: [{name:'أول/1 بنات', students: 24}], absent: {sun:1, mon:0, tue:1, wed:0, thu:0} },
+            { id: 'h_g_m', branch: 'الحزم', section: 'بنات', grade: 'متوسط', name: 'الحزم - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات', students: 29}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_g_s', branch: 'الحزم', section: 'بنات', grade: 'ثانوي', name: 'الحزم - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات', students: 31}], absent: {sun:0, mon:1, tue:0, wed:1, thu:0} },
+            { id: 't_b_p', branch: 'طويق', section: 'بنين', grade: 'ابتدائي', name: 'طويق - بنين - ابتدائي', classes: [{name:'أول/1 طويق', students: 26}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_b_m', branch: 'طويق', section: 'بنين', grade: 'متوسط', name: 'طويق - بنين - متوسط', classes: [{name:'أول متوسط/1 طويق', students: 28}], absent: {sun:1, mon:1, tue:0, wed:0, thu:0} },
+            { id: 't_b_s', branch: 'طويق', section: 'بنين', grade: 'ثانوي', name: 'طويق - بنين - ثانوي', classes: [{name:'أول ثانوي/1 طويق', students: 30}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_k', branch: 'طويق', section: 'بنات', grade: 'رياض أطفال', name: 'طويق - بنات - رياض أطفال', classes: [{name:'روضة/1 طويق', students: 18}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_p', branch: 'طويق', section: 'بنات', grade: 'ابتدائي', name: 'طويق - بنات - ابتدائي', classes: [{name:'أول/1 بنات طويق', students: 22}], absent: {sun:0, mon:0, tue:1, wed:0, thu:0} },
+            { id: 't_g_m', branch: 'طويق', section: 'بنات', grade: 'متوسط', name: 'طويق - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات طويق', students: 27}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_s', branch: 'طويق', section: 'بنات', grade: 'ثانوي', name: 'طويق - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات طويق', students: 29}], absent: {sun:0, mon:0, tue:0, wed:1, thu:0} }
         ];
 
         let users = JSON.parse(localStorage.getItem('sharjah_users_data')) || [
@@ -592,13 +612,16 @@
         let currentUser = null;
         let currentActiveSchoolId = null;
         let holidays = { sun: false, mon: false, tue: false, wed: false, thu: false };
-        let currentActiveWeekCode = 't1_w7';
         let currentPage = 1;
 
-        // دالة الحفظ التلقائي في المتصفح
         function saveDataToStorage() {
             localStorage.setItem('sharjah_schools_data', JSON.stringify(schoolsData));
             localStorage.setItem('sharjah_users_data', JSON.stringify(users));
+        }
+
+        function manualSaveData() {
+            saveDataToStorage();
+            alert('💾 تم حفظ جميع البيانات بنجاح في المتصفح!');
         }
 
         document.addEventListener("DOMContentLoaded", () => {
@@ -614,11 +637,6 @@
             if(!weekSelect) return;
             weekSelect.innerHTML = '';
             
-            let optAll = document.createElement('option');
-            optAll.value = 'ALL';
-            optAll.innerText = 'جميع الأسابيع';
-            weekSelect.appendChild(optAll);
-
             let weeksList = [];
             if(termVal === 'ALL') {
                 weeksList = [...schoolWeeksData.term1, ...schoolWeeksData.term2];
@@ -626,31 +644,54 @@
                 weeksList = termVal === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
             }
 
+            let currentWeekParsed = parseWeekCode(currentActiveWeekCode);
+
             weeksList.forEach((w, idx) => {
+                let termNum = termVal === 'ALL' ? (idx < schoolWeeksData.term1.length ? 1 : 2) : parseInt(termVal);
+                let wCode = `t${termNum}_w${w.week}_${idx}`;
+
+                if (currentUser && (currentUser.role === 'SCHOOL' || currentUser.role === 'MANAGER')) {
+                    if (isFutureWeek(termNum, w.week, currentWeekParsed)) {
+                        return;
+                    }
+                }
+
                 let opt = document.createElement('option');
-                opt.value = `t${termVal}_w${w.week}_${idx}`;
+                opt.value = wCode;
                 opt.innerText = w.label;
-                if(termVal === '1' && w.week === 7) opt.selected = true;
+                if(wCode === currentActiveWeekCode) opt.selected = true;
                 weekSelect.appendChild(opt);
             });
+
+            if(weekSelect.options.length === 0 && weeksList.length > 0) {
+                let opt = document.createElement('option');
+                opt.value = currentActiveWeekCode;
+                opt.innerText = 'الأسبوع الحالي';
+                weekSelect.appendChild(opt);
+            }
             onWeekChange();
+        }
+
+        function parseWeekCode(code) {
+            let parts = code.split('_');
+            return { term: parseInt(parts[0].replace('t','')), week: parseInt(parts[1].replace('w','')) };
+        }
+
+        function isFutureWeek(term, week, current) {
+            if (term > current.term) return true;
+            if (term === current.term && week > current.week) return true;
+            return false;
         }
 
         function onWeekChange() {
             const weekSelect = document.getElementById('weekSelect');
-            if(!weekSelect) return;
-            const weekVal = weekSelect.value;
-            if(!weekVal || weekVal === 'ALL') {
-                let sSun = document.getElementById('date_sun');
-                let sThu = document.getElementById('date_thu');
-                if(sSun) sSun.value = '2026-08-23';
-                if(sThu) sThu.value = '2027-06-24';
-                updateDatesHeader();
-                return;
-            }
-            let weekNum = parseInt(weekVal.split('_')[1].replace('w', ''));
-            let activeTerm = weekVal.includes('t2') ? '2' : '1';
-            let weeksList = activeTerm === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
+            if(!weekSelect || !weekSelect.value) return;
+            let weekVal = weekSelect.value;
+            let parts = weekVal.split('_');
+            let termNum = parts[0].replace('t', '');
+            let weekNum = parseInt(parts[1].replace('w', ''));
+
+            let weeksList = termNum === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
             let wkObj = weeksList.find(w => w.week === weekNum);
             if(wkObj) {
                 let sSun = document.getElementById('date_sun');
@@ -667,7 +708,7 @@
             if(termSel) termSel.value = '1';
             onTermChange();
             let weekSel = document.getElementById('weekSelect');
-            if(weekSel) weekSel.value = 't1_w7_6';
+            if(weekSel) weekSel.value = currentActiveWeekCode;
             onWeekChange();
         }
 
@@ -682,6 +723,10 @@
         }
 
         function goHomeMain() {
+            if(currentUser && currentUser.role === 'SCHOOL') {
+                renderSchoolTable(currentUser.schoolId);
+                return;
+            }
             showView('view-main', document.querySelector('.sidebar-menu a'));
             backToDashboard();
         }
@@ -798,32 +843,44 @@
             let banner = document.getElementById('alert-banner');
             let actionBox = document.getElementById('school-action-box');
             let actionTh = document.getElementById('th-action-col');
+            let saveGlobalBtn = document.getElementById('btn-save-global');
 
             let allowEdit = true;
 
-            if (currentUser && (currentUser.role === 'SUPER_ADMIN' || currentUser.username === 'edu_head')) {
+            // تحديد الصلاحيات بدقة تامة: الأسابيع السابقة مقفلة تماماً كحقول "ميتة" إلا لمن يمتلك صلاحية استثنائية
+            if (currentUser && currentUser.role === 'MANAGER') {
+                allowEdit = false;
+                if(banner) {
+                    banner.style.display = 'block';
+                    banner.innerText = '👁️ صلاحية مدير مجمع: استعراض بيانات مدارس مجمعك فقط (للقراءة فقط - حقول ميتة).';
+                }
+            } else if (currentUser && currentUser.role === 'SUPER_ADMIN') {
                 allowEdit = true;
                 if(banner) banner.style.display = 'none';
-            } else if (selectedWeek < currentActiveWeekCode && selectedWeek !== 'ALL') {
+            } else if (selectedWeek !== currentActiveWeekCode) {
                 if (currentUser && currentUser.allowPastEdit) {
                     allowEdit = true;
                     if(banner) {
                         banner.style.display = 'block';
-                        banner.innerText = '🔓 ملاحظة: أنت تستعرض أسبوعاً سابقاً مع وجود صلاحية استثنائية بالتعديل.';
+                        banner.innerText = '🔓 ملاحظة: تمتلك صلاحية استثنائية بالتعديل في الأسابيع السابقة.';
                     }
                 } else {
                     allowEdit = false;
                     if(banner) {
                         banner.style.display = 'block';
-                        banner.innerText = '⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً. وضع التعديل مقفل (للقراءة فقط).';
+                        banner.innerText = '⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً. كافة الحقول مقفلة تماماً (للقراءة فقط).';
                     }
                 }
             } else {
                 if(banner) banner.style.display = 'none';
+                if(currentUser && currentUser.role !== 'SCHOOL') {
+                    allowEdit = false; // مدير المجمع والمشرفون يستعرضون فقط
+                }
             }
 
-            if(actionBox) actionBox.style.display = allowEdit ? 'flex' : 'none';
+            if(actionBox) actionBox.style.display = (allowEdit && currentUser.role === 'SCHOOL') ? 'flex' : 'none';
             if(actionTh) actionTh.style.display = allowEdit ? 'table-cell' : 'none';
+            if(saveGlobalBtn) saveGlobalBtn.style.display = allowEdit ? 'inline-block' : 'none';
 
             return allowEdit;
         }
@@ -862,17 +919,25 @@
             let sectionSel = document.getElementById('sb-section');
             let gradeSel = document.getElementById('sb-grade');
 
-            if(branchSel) branchSel.value = 'ALL';
-            if(sectionSel) sectionSel.value = 'ALL';
-            if(gradeSel) gradeSel.value = 'ALL';
+            if(branchSel) { branchSel.value = 'ALL'; branchSel.disabled = false; }
+            if(sectionSel) { sectionSel.value = 'ALL'; sectionSel.disabled = false; }
+            if(gradeSel) { gradeSel.value = 'ALL'; gradeSel.disabled = false; }
             onSectionFilterChange();
 
-            if(currentUser.role === 'MANAGER' && currentUser.branch) {
-                if(branchSel) branchSel.value = currentUser.branch;
+            // تطبيق القيود الأمنية المطلوبة بحيث يرى المستخدم فقط نطاقه ولا يظهر له غيره
+            if(currentUser.role === 'SCHOOL' && currentUser.schoolId) {
+                let school = schoolsData.find(s => s.id === currentUser.schoolId);
+                if(school) {
+                    if(branchSel) { branchSel.value = school.branch; branchSel.disabled = true; }
+                    if(sectionSel) { sectionSel.value = school.section; sectionSel.disabled = true; onSectionFilterChange(); }
+                    if(gradeSel) { gradeSel.value = school.grade; gradeSel.disabled = true; }
+                }
+            } else if(currentUser.role === 'MANAGER' && currentUser.branch) {
+                if(branchSel) { branchSel.value = currentUser.branch; branchSel.disabled = true; }
             } else if(currentUser.role === 'SUPERVISOR' && currentUser.section) {
-                if(sectionSel) sectionSel.value = currentUser.section;
-                onSectionFilterChange();
+                if(sectionSel) { sectionSel.value = currentUser.section; sectionSel.disabled = true; onSectionFilterChange(); }
             }
+            onTermChange();
         }
 
         function getRoleTitle(role) {
@@ -908,11 +973,15 @@
 
             if(usersLi) usersLi.style.display = (perms === 'SUPER_ADMIN' || perms === 'MANAGER') ? 'block' : 'none';
             if(permsLi) permsLi.style.display = (perms === 'SUPER_ADMIN' || perms === 'MANAGER') ? 'block' : 'none';
-            if(filtersBox) filtersBox.style.display = (perms !== 'SCHOOL') ? 'block' : 'none';
+            if(filtersBox) filtersBox.style.display = 'block';
 
             if(perms === 'SCHOOL') {
+                let backBtn = document.getElementById('btn-back-dash');
+                if(backBtn) backBtn.style.display = 'none';
                 renderSchoolTable(currentUser.schoolId);
             } else {
+                let backBtn = document.getElementById('btn-back-dash');
+                if(backBtn) backBtn.style.display = 'inline-block';
                 backToDashboard();
             }
 
@@ -948,8 +1017,13 @@
             tbody.innerHTML = '';
 
             let canEdit = checkWeekPermissions();
-            if(currentUser.role === 'SUPER_ADMIN' || currentUser.username === 'edu_head') canEdit = true;
-            if(currentUser.role === 'SCHOOL') canEdit = true;
+            if(currentUser.role === 'MANAGER') canEdit = false;
+            if(currentUser.role === 'SCHOOL') {
+                let weekSel = document.getElementById('weekSelect');
+                if(weekSel && weekSel.value !== currentActiveWeekCode) {
+                    canEdit = false;
+                }
+            }
 
             if(school && (!school.classes || school.classes.length === 0)) {
                 school.classes = [{name:'أول/1', students: 25}];
@@ -959,14 +1033,14 @@
             school.classes.forEach((cls, idx) => {
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!canEdit?'readonly':''} onchange="updateClassName(this, '${schoolId}', ${idx})"></td>
-                    <td><input type="number" class="input-absent" value="${cls.students}" ${!canEdit?'readonly':''} onchange="updateClassStudents(this, '${schoolId}', ${idx})"></td>
+                    <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!canEdit?'readonly':''} oninput="updateClassName(this, '${schoolId}',${idx})"></td>
+                    <td><input type="number" class="input-absent" value="${cls.students}" ${!canEdit?'readonly':''} oninput="updateClassStudents(this, '${schoolId}',${idx})"></td>
                     <td><input type="number" class="input-absent ${holidays.sun?'input-disabled':''}" ${holidays.sun || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.sun : ''}" oninput="updateSchoolAbsent('${schoolId}', 'sun', this)"></td>
                     <td><input type="number" class="input-absent ${holidays.mon?'input-disabled':''}" ${holidays.mon || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.mon : ''}" oninput="updateSchoolAbsent('${schoolId}', 'mon', this)"></td>
                     <td><input type="number" class="input-absent ${holidays.tue?'input-disabled':''}" ${holidays.tue || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.tue : ''}" oninput="updateSchoolAbsent('${schoolId}', 'tue', this)"></td>
                     <td><input type="number" class="input-absent ${holidays.wed?'input-disabled':''}" ${holidays.wed || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.wed : ''}" oninput="updateSchoolAbsent('${schoolId}', 'wed', this)"></td>
                     <td><input type="number" class="input-absent ${holidays.thu?'input-disabled':''}" ${holidays.thu || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.thu : ''}" oninput="updateSchoolAbsent('${schoolId}', 'thu', this)"></td>
-                    <td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>
+                    ${canEdit ? `<td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>` : ''}
                 `;
                 tbody.appendChild(tr);
             });
@@ -975,33 +1049,41 @@
         }
 
         function updateSchoolAbsent(schoolId, day, input) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) return; // منع التعديل تماماً إذا كان الحقل مقفلاً
             let school = schoolsData.find(s => s.id === schoolId);
             if(school) {
                 if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
                 school.absent[day] = parseInt(input.value) || 0;
-                saveDataToStorage(); // حفظ تلقائي
+                saveDataToStorage();
                 calculateStats();
             }
         }
 
         function updateClassName(input, schoolId, index) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) return;
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes[index]) {
                 school.classes[index].name = input.value.trim();
-                saveDataToStorage(); // حفظ تلقائي
+                saveDataToStorage();
             }
         }
 
         function updateClassStudents(input, schoolId, index) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) return;
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes[index]) {
                 school.classes[index].students = parseInt(input.value) || 0;
-                saveDataToStorage(); // حفظ تلقائي
+                saveDataToStorage();
                 calculateStats();
             }
         }
 
         function addNewClassToSchool() {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل. لا يمكن الإضافة.'); return; }
             let nameInput = document.getElementById('newClassNameInput');
             let studInput = document.getElementById('newClassStudentsInput');
             if(!nameInput) return;
@@ -1013,17 +1095,19 @@
             if(!school) { alert('⚠️ يرجى اختيار المدرسة أولاً.'); return; }
             if(!school.classes) school.classes = [];
             school.classes.push({ name: cName, students: cStudents });
-            saveDataToStorage(); // حفظ تلقائي
+            saveDataToStorage();
             nameInput.value = '';
             renderSchoolTable(school.id);
         }
 
         function deleteClassRow(schoolId, index) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل. لا يمكن الحذف.'); return; }
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes.length > 1) {
                 if(confirm('هل أنت متأكد من حذف هذا الفصل؟')) {
                     school.classes.splice(index, 1);
-                    saveDataToStorage(); // حفظ تلقائي
+                    saveDataToStorage();
                     renderSchoolTable(schoolId);
                 }
             } else {
@@ -1032,6 +1116,8 @@
         }
 
         function toggleHoliday(day) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
             holidays[day] = !holidays[day];
             let btn = document.getElementById(`btn${day.charAt(0).toUpperCase() + day.slice(1)}`);
             if(btn) {
@@ -1121,6 +1207,13 @@
             } else if (currentUser && currentUser.role === 'SUPERVISOR' && currentUser.section) {
                 sectionVal = currentUser.section;
                 if(sectionSel) { sectionSel.value = currentUser.section; sectionSel.disabled = true; }
+            } else if (currentUser && currentUser.role === 'SCHOOL') {
+                let school = schoolsData.find(s => s.id === currentUser.schoolId);
+                if(school) {
+                    branchVal = school.branch;
+                    sectionVal = school.section;
+                    gradeVal = school.grade;
+                }
             }
 
             let list = [...schoolsData];
@@ -1197,27 +1290,23 @@
         }
 
         function viewSchoolDetail(schoolId) {
+            if(currentUser.role === 'SCHOOL') return;
             renderSchoolTable(schoolId);
         }
 
         function backToDashboard() {
+            if(currentUser && currentUser.role === 'SCHOOL') return;
             currentActiveSchoolId = null;
             let dashView = document.getElementById('dashboardView');
             let schoolView = document.getElementById('schoolTableView');
             if(schoolView) schoolView.style.display = 'none';
             if(dashView) dashView.style.display = 'block';
-            
-            let branchSel = document.getElementById('sb-branch');
-            let sectionSel = document.getElementById('sb-section');
-            let gradeSel = document.getElementById('sb-grade');
-            if(branchSel && !branchSel.disabled) branchSel.value = 'ALL';
-            if(sectionSel && !sectionSel.disabled) sectionSel.value = 'ALL';
-            if(gradeSel) gradeSel.value = 'ALL';
-
             renderDashboard();
         }
 
         function exportEmptyTemplateExcel() {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
             let data = [{ "اسم الفصل": "أول/1", "عدد الطلاب": 25 }, { "اسم الفصل": "ثاني/1", "عدد الطلاب": 25 }];
             let ws = XLSX.utils.json_to_sheet(data);
             let wb = XLSX.utils.book_new();
@@ -1226,6 +1315,8 @@
         }
 
         function importSchoolClassesFromExcel(e) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
             let file = e.target.files[0];
             if(!file) return;
             let reader = new FileReader();
@@ -1246,7 +1337,7 @@
                     if(newClasses.length > 0) {
                         if(!school.classes) school.classes = [];
                         school.classes = newClasses;
-                        saveDataToStorage(); // حفظ تلقائي
+                        saveDataToStorage();
                         renderSchoolTable(school.id);
                         alert(`✅ تم استيراد ${newClasses.length} فصول بنجاح.`);
                     }
@@ -1329,7 +1420,7 @@
             let role = rSelect.value;
             let sId = sSelect.value;
             users.push({ username: u, pass: p, role: role, schoolId: sId, name: u, allowPastEdit: false });
-            saveDataToStorage(); // حفظ تلقائي
+            saveDataToStorage();
             alert('✅ تمت إضافة المستخدم بنجاح.');
             renderUsersList();
             renderPermsList();
@@ -1338,7 +1429,7 @@
         function renderUsersList() {
             const tbody = document.getElementById('usersTbody');
             if(!tbody) return;
-            tbody.innerHTML = '';
+            tbody.innerHTML = ``;
             users.forEach((u, index) => {
                 let schName = 'عام';
                 if(u.schoolId) {
@@ -1360,7 +1451,7 @@
         function renderPermsList() {
             const tbody = document.getElementById('permsTbody');
             if(!tbody) return;
-            tbody.innerHTML = '';
+            tbody.innerHTML = ``;
             users.forEach((u, index) => {
                 let tr = document.createElement('tr');
                 tr.innerHTML = `
@@ -1377,7 +1468,7 @@
 
         function togglePastEdit(index, val) {
             users[index].allowPastEdit = val;
-            saveDataToStorage(); // حفظ تلقائي
+            saveDataToStorage();
             renderPermsList();
         }
     </script>
