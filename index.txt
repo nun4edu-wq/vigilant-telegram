@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>مدارس الشارقة الأهلية - نظام متابعة الغياب اليومي والانضباط المدرسي</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --sidebar-width: 240px;
+            --purple-dark: #38023B;
+            --purple-header: #29002B;
+            --accent-yellow: #FFC107;
+            --btn-blue: #0D6EFD;
+            --btn-green: #198754;
+            --bg-body: #F4F5F7;
+            --border-color: #DDE1E5;
+            --pink-accent: #DC3545;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Tajawal', sans-serif; }
+        body { background-color: var(--bg-body); display: flex; height: 100vh; overflow: hidden; direction: rtl; }
+
+        input[type="date"], input[type="number"] {
+            direction: ltr !important;
+            text-align: center !important;
+            unicode-bidi: plaintext !important;
+        }
+
+        #login-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, var(--purple-dark), #1A001C);
+            display: flex; justify-content: center; align-items: center; z-index: 10000;
+        }
+
+        .login-box {
+            background: white; padding: 25px 30px; border-radius: 10px; width: 400px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4); text-align: center;
+        }
+        .login-school-logo { max-width: 140px; height: auto; object-fit: contain; margin-bottom: 12px; }
+        .login-waslna-logo { max-height: 35px; width: auto; object-fit: contain; margin-top: 15px; }
+
+        .login-box h2 { color: var(--purple-dark); font-size: 1.1rem; font-weight: 800; margin-bottom: 2px; }
+        .login-box p { color: #666; font-size: 0.75rem; margin-bottom: 5px; }
+        .login-programming-tag { font-size: 0.7rem; color: #888; margin-bottom: 15px; font-weight: bold; white-space: nowrap; }
+
+        .form-group-login { text-align: right; margin-bottom: 12px; }
+        .form-group-login label { display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 3px; }
+        .form-group-login input, .form-group-login select { width: 100%; padding: 7px; border: 1px solid #CCC; border-radius: 4px; font-size: 0.82rem; }
+
+        .btn-submit-login {
+            width: 100%; background: var(--purple-dark); color: white; border: none;
+            padding: 9px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 0.88rem; margin-top: 8px;
+        }
+
+        aside.sidebar {
+            width: var(--sidebar-width); background-color: var(--purple-dark); color: white;
+            display: flex; flex-direction: column; flex-shrink: 0; z-index: 100; overflow-y: auto;
+        }
+
+        .sidebar-brand { padding: 15px 10px; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .sidebar-logo-img { max-width: 150px; height: auto; display: block; margin: 0 auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        .sidebar-prog-credit { font-size: 0.6rem; color: var(--accent-yellow); margin-top: 5px; text-align: center; font-weight: bold; white-space: nowrap; }
+
+        .sidebar-menu { list-style: none; margin-top: 10px; }
+        .sidebar-menu li { margin-bottom: 2px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 6px; padding: 10px 12px;
+            color: #D8C2D8; text-decoration: none; font-size: 0.78rem; font-weight: 700;
+            transition: all 0.2s; border-right: 4px solid transparent; cursor: pointer;
+        }
+        .sidebar-menu a:hover { background-color: rgba(255,255,255,0.08); color: #FFF; }
+        .sidebar-menu a.active { background-color: rgba(255,255,255,0.15); color: #FFF; border-right-color: var(--accent-yellow); }
+
+        .sidebar-filters { padding: 12px 10px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 10px; }
+        .sidebar-filter-title { font-size: 0.8rem; font-weight: 800; color: var(--accent-yellow); margin-bottom: 8px; }
+        .sidebar-form-item { display: flex; flex-direction: column; gap: 3px; margin-bottom: 8px; }
+        .sidebar-form-item label { font-size: 0.7rem; color: #DDD; font-weight: 600; }
+        .sidebar-form-item select {
+            padding: 5px; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px;
+            font-size: 0.75rem; background-color: rgba(255,255,255,0.95); color: #000;
+        }
+
+        .main-wrapper { flex-grow: 1; display: flex; flex-direction: column; overflow-y: auto; }
+
+        header.topbar {
+            background-color: var(--purple-header); color: white; padding: 8px 15px;
+            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
+        }
+
+        .topbar-left { display: flex; align-items: center; gap: 10px; }
+        .brand-motto-wrap { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.12); padding: 3px 10px; border-radius: 4px; }
+        .topbar-logo-img { height: 26px; width: auto; object-fit: contain; }
+        .brand-motto-text { font-weight: 800; font-size: 0.8rem; color: #FFF; white-space: nowrap; }
+
+        .topbar-right-nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .top-nav-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.3); color: white;
+            padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; text-decoration: none; font-weight: 700;
+            display: inline-flex; align-items: center; gap: 4px; transition: all 0.2s ease; cursor: pointer; white-space: nowrap;
+        }
+        .top-nav-btn:hover { background-color: rgba(255,255,255,0.2); border-color: #FFF; }
+        .top-nav-btn.logout { background-color: #8B0000; border-color: #8B0000; }
+
+        .content-area { padding: 15px; flex-grow: 1; }
+        .view-title { color: #0D6EFD; font-size: 1.1rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+        .filter-card { background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 12px; margin-bottom: 12px; }
+        .filter-card-header {
+            font-size: 0.85rem; font-weight: 800; color: var(--purple-dark);
+            margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .filter-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; }
+        .filter-item { display: flex; flex-direction: column; gap: 3px; }
+        .filter-item label { font-size: 0.73rem; font-weight: 700; color: #333; }
+        .filter-item select, .filter-item input { padding: 5px 8px; border: 1px solid #CCC; border-radius: 4px; font-size: 0.8rem; background-color: #FFF; }
+
+        .btn-action-excel {
+            background-color: var(--btn-green); color: white; border: none; padding: 6px 12px;
+            border-radius: 4px; font-weight: 700; font-size: 0.78rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;
+        }
+        .btn-current-week {
+            background-color: var(--btn-blue); color: white; border: none; padding: 4px 10px;
+            border-radius: 4px; font-weight: 700; font-size: 0.78rem; cursor: pointer;
+        }
+
+        .table-container { background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow-x: auto; margin-bottom: 15px; padding: 10px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.78rem; text-align: center; }
+        th { background-color: var(--purple-dark); color: white; padding: 8px; font-weight: 700; border: 1px solid rgba(255,255,255,0.15); white-space: nowrap; }
+        td { padding: 6px 8px; border: 1px solid #E2E8F0; vertical-align: middle; height: 40px; white-space: nowrap; }
+        tr:nth-child(even) { background-color: #F8FAFC; }
+
+        .stats-table { width: 100%; border-collapse: collapse; text-align: center; margin-top: 10px; font-size: 0.78rem; }
+        .stats-table th { background-color: var(--accent-yellow); color: #000; padding: 6px; font-weight: 800; }
+        .stats-table td { padding: 6px; border: 1px solid #E2E8F0; font-weight: bold; }
+        .discipline-row { background-color: #E8F5E9; color: #1B5E20; }
+
+        .input-absent { width: 60px; text-align: center; padding: 4px; border: 1px solid #CCC; border-radius: 4px; font-weight: bold; font-size: 0.8rem; }
+        .input-disabled { background: #EDF2F7; border-color: #E2E8F0; cursor: not-allowed; }
+
+        .day-title-blue { color: #6EA8FE; font-weight: bold; font-size: 0.85rem; display: block; }
+        .day-date { font-size: 0.68rem; font-weight: normal; color: #E2E8F0; margin-top: 2px; display: block; }
+        .day-toggle { background: #EEE; border: 1px solid #CCC; padding: 1px 4px; border-radius: 3px; font-size: 0.65rem; cursor: pointer; margin-top: 2px; display: block; width: 100%; color: #333; }
+        .day-toggle.holiday { background: var(--pink-accent); color: white; border-color: var(--pink-accent); }
+
+        .btn-add { background: var(--btn-green); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.78rem; }
+        .btn-danger { background: var(--pink-accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.73rem; }
+        .btn-template { background: var(--btn-blue); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.78rem; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+
+        .pagination-container {
+            display: flex; justify-content: center; align-items: center; gap: 6px; margin: 15px 0 5px 0;
+        }
+        .page-btn {
+            background-color: #FFF; border: 1px solid var(--border-color); color: var(--purple-dark);
+            padding: 6px 12px; border-radius: 6px; font-weight: 700; font-size: 0.8rem; cursor: pointer;
+            transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .page-btn:hover { background-color: #F1F3F5; border-color: var(--purple-dark); }
+        .page-btn.active {
+            background-color: var(--purple-dark); color: #FFF; border-color: var(--purple-dark);
+            box-shadow: 0 4px 8px rgba(56,2,59,0.3);
+        }
+        footer.app-footer {
+            text-align: center; padding: 8px; font-size: 0.72rem; color: #666; background: #FFF; border-top: 1px solid var(--border-color); margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="شعار مدارس الشارقة الأهلية" class="login-school-logo">
+            <h2>مدارس الشارقة الأهلية</h2>
+            <p>نظام متابعة الغياب اليومي والانضباط</p>
+            <div class="login-programming-tag">برمجة الشؤون التعليمية بمدارس الشارقة الأهلية</div>
+            <form onsubmit="handleLogin(event)">
+                <div class="form-group-login">
+                    <label>اسم المستخدم:</label>
+                    <input type="text" id="login-user" placeholder="" autocomplete="off" required>
+                </div>
+                <div class="form-group-login">
+                    <label>كلمة المرور:</label>
+                    <input type="password" id="login-pass" placeholder="" autocomplete="off" required>
+                </div>
+                <button type="submit" class="btn-submit-login">دخول النظام</button>
+            </form>
+            <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="شعار وصلنا ومكملين" class="login-waslna-logo">
+        </div>
+    </div>
+
+    <aside class="sidebar" id="sidebar-nav" style="display:none;">
+        <div class="sidebar-brand">
+            <img src="https://i.postimg.cc/Df91cPk8/waslna-png.png" alt="مدارس الشارقة الأهلية" class="sidebar-logo-img">
+            <div class="sidebar-prog-credit">برمجة الشؤون التعليمية بمدارس الشارقة الأهلية</div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="#" class="active" onclick="goHomeMain();"><span>📊</span> لوحة ترتيب الأقسام</a></li>
+            <li id="menu-perms-li" style="display:block;"><a href="#" onclick="showView('view-perms', this)"><span>🔑</span> إدارة الصلاحيات الاستثنائية</a></li>
+            <li id="menu-users-li" style="display:block;"><a href="#" onclick="showView('view-users', this)"><span>👤</span> إدارة المستخدمين</a></li>
+        </ul>
+
+        <div class="sidebar-filters" id="sidebar-filters-box" style="display:block;">
+            <div class="sidebar-filter-title">🏢 فلاتر العرض الديناميكية</div>
+            <div class="sidebar-form-item">
+                <label>الفرع:</label>
+                <select id="sb-branch" onchange="renderDashboard()">
+                    <option value="ALL" selected>جميع الفروع</option>
+                    <option value="الحزم">الحزم</option>
+                    <option value="طويق">طويق</option>
+                </select>
+            </div>
+            <div class="sidebar-form-item">
+                <label>القسم (الجنس):</label>
+                <select id="sb-section" onchange="onSectionFilterChange()">
+                    <option value="ALL" selected>جميع الأقسام</option>
+                    <option value="بنين">بنين</option>
+                    <option value="بنات">بنات</option>
+                </select>
+            </div>
+            <div class="sidebar-form-item">
+                <label>المرحلة الدراسية:</label>
+                <select id="sb-grade" onchange="renderDashboard()">
+                    <option value="ALL" selected>جميع المراحل</option>
+                    <option value="رياض أطفال">رياض أطفال</option>
+                    <option value="ابتدائي">ابتدائي</option>
+                    <option value="متوسط">متوسط</option>
+                    <option value="ثانوي">ثانوي</option>
+                </select>
+            </div>
+        </div>
+    </aside>
+
+    <div class="main-wrapper">
+        <header class="topbar" id="topbar-header" style="display:none;">
+            <div class="topbar-left">
+                <div class="brand-motto-wrap">
+                    <img src="https://i.postimg.cc/Kvc3fqq0/wslna.png" alt="وصلنا ومكملين" class="topbar-logo-img">
+                    <span class="brand-motto-text">وصلنا ومكملين</span>
+                </div>
+            </div>
+            <div class="topbar-right-nav">
+                <span id="user-badge-info" style="font-size:0.75rem; font-weight:bold; background:rgba(255,255,255,0.15); padding:3px 8px; border-radius:4px; white-space:nowrap;"></span>
+                <button class="top-nav-btn" onclick="goHomeMain()">🏠 الرئيسية</button>
+                <button class="top-nav-btn" onclick="navigateWeek(1)">▶ السابق</button>
+                <button class="top-nav-btn" onclick="navigateWeek(-1)">التالي ◀</button>
+                <button class="top-nav-btn logout" onclick="logout()">🚪 خروج</button>
+            </div>
+        </header>
+
+        <div class="content-area" id="content-area-main" style="display:none;">
+            
+            <div id="view-main">
+                <div class="view-title">
+                    <span id="main-view-heading">لوحة ترتيب الأقسام والمتابعة</span>
+                    <button class="btn-action-excel" onclick="exportToExcel()">📊 تصدير البيانات إلى Excel</button>
+                </div>
+
+                <div class="filter-card">
+                    <div class="filter-card-header">
+                        <span>📅 تحديد فترة التقرير</span>
+                        <button class="btn-current-week" onclick="resetToCurrentWeek()">الأسبوع الحالي</button>
+                    </div>
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>الفصل الدراسي:</label>
+                            <select id="termSelect" onchange="onTermChange()">
+                                <option value="ALL">جميع الفصول الدراسية</option>
+                                <option value="1" selected>الفصل الدراسي الأول</option>
+                                <option value="2">الفصل الدراسي الثاني</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>اختر الأسبوع:</label>
+                            <select id="weekSelect" onchange="onWeekChange()"></select>
+                        </div>
+                        <div class="filter-item">
+                            <label id="label_date_start">الأحد:</label>
+                            <input type="date" id="date_sun" oninput="updateDatesHeader()" onchange="updateDatesHeader()" style="background:#FFF;">
+                        </div>
+                        <div class="filter-item">
+                            <label id="label_date_end">الخميس:</label>
+                            <input type="date" id="date_thu" oninput="updateDatesHeader()" onchange="updateDatesHeader()" style="background:#FFF;">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="alert-banner" style="display:none; background:#FFF3CD; color:#856404; padding:10px; border-radius:4px; margin-bottom:10px; font-weight:bold; font-size:0.8rem; border:1px solid #FFEEBA;">
+                    ⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً أو لاحقاً. وضع التعديل مقفل (للقراءة فقط) بناءً على الصلاحيات.
+                </div>
+
+                <div id="dashboardView" style="display:block;" class="table-container">
+                    <h3 style="color:var(--purple-dark); margin-bottom:10px; font-size:0.95rem;">لوحة تجميع وترتيب الأقسام والمجموعات</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>الترتيب</th>
+                                <th>المدرسة / القسم</th>
+                                <th>الفرع</th>
+                                <th>إجمالي الطلاب</th>
+                                <th><span class="day-title-blue" id="dash_title_sun">الأحد</span><span class="day-date" id="dash_date_sun">--</span></th>
+                                <th><span class="day-title-blue" id="dash_title_mon">الاثنين</span><span class="day-date" id="dash_date_mon">--</span></th>
+                                <th><span class="day-title-blue" id="dash_title_tue">الثلاثاء</span><span class="day-date" id="dash_date_tue">--</span></th>
+                                <th><span class="day-title-blue" id="dash_title_wed">الأربعاء</span><span class="day-date" id="dash_date_wed">--</span></th>
+                                <th><span class="day-title-blue" id="dash_title_thu">الخميس</span><span class="day-date" id="dash_date_thu">--</span></th>
+                                <th>إجمالي الغياب</th>
+                                <th>نسبة الانضباط</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dashboardTbody"></tbody>
+                    </table>
+
+                    <div class="pagination-container" id="paginationBox"></div>
+
+                    <h4 style="margin-top:15px; color:var(--purple-dark); font-size:0.88rem;">📊 إحصائية الانضباط والغياب المجمعة</h4>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>البيان</th>
+                                <th>الفترة (تراكمي)</th>
+                                <th id="st_h_1">الأحد</th>
+                                <th id="st_h_2">الاثنين</th>
+                                <th id="st_h_3">الثلاثاء</th>
+                                <th id="st_h_4">الأربعاء</th>
+                                <th id="st_h_5">الخميس</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="background:#FFFDF0;">عدد الطلاب</td>
+                                <td id="dstat_students_week">0</td>
+                                <td id="dstat_students_sun">0</td>
+                                <td id="dstat_students_mon">0</td>
+                                <td id="dstat_students_tue">0</td>
+                                <td id="dstat_students_wed">0</td>
+                                <td id="dstat_students_thu">0</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#FFFDF0;">الحضور</td>
+                                <td id="dstat_present_week">-</td>
+                                <td id="dstat_present_sun">0</td>
+                                <td id="dstat_present_mon">0</td>
+                                <td id="dstat_present_tue">0</td>
+                                <td id="dstat_present_wed">0</td>
+                                <td id="dstat_present_thu">0</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#FFFDF0;">الغياب</td>
+                                <td id="dstat_absent_week">-</td>
+                                <td id="dstat_absent_sun">0</td>
+                                <td id="dstat_absent_mon">0</td>
+                                <td id="dstat_absent_tue">0</td>
+                                <td id="dstat_absent_wed">0</td>
+                                <td id="dstat_absent_thu">0</td>
+                            </tr>
+                            <tr class="discipline-row">
+                                <td>نسبة الانضباط</td>
+                                <td id="dstat_rate_week">100%</td>
+                                <td id="dstat_rate_sun">100%</td>
+                                <td id="dstat_rate_mon">100%</td>
+                                <td id="dstat_rate_tue">100%</td>
+                                <td id="dstat_rate_wed">100%</td>
+                                <td id="dstat_rate_thu">100%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="schoolTableView" style="display:none;" class="table-container">
+                    <button class="top-nav-btn" style="background:var(--purple-dark); margin-bottom:10px;" onclick="backToDashboard()">⬅ العودة للوحة ترتيب الأقسام</button>
+                    
+                    <div id="school-action-box" style="background:#F8FAFC; padding:10px; border-radius:4px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border:1px dashed var(--purple-dark);">
+                        <div style="display:flex; gap:6px; align-items:center;">
+                            <span style="font-weight:bold; color:var(--purple-dark); font-size:0.8rem;">➕ إضافة فصل:</span>
+                            <input type="text" id="newClassNameInput" placeholder="اسم الفصل (مثال: ثالث/2)" style="padding:4px; font-size:0.8rem; width:130px; border:1px solid #CCC; border-radius:4px;">
+                            <input type="number" id="newClassStudentsInput" placeholder="الطلاب" value="25" min="1" style="padding:4px; font-size:0.8rem; width:70px; border:1px solid #CCC; border-radius:4px;">
+                            <button class="btn-add" onclick="addNewClassToSchool()">إضافة فصل</button>
+                        </div>
+                        <div style="display:flex; gap:6px;">
+                            <button class="btn-template" onclick="exportEmptyTemplateExcel()">📥 تحميل قالب فارغ</button>
+                            <label class="btn-template" style="cursor:pointer; background:var(--btn-green); margin:0;">
+                                📤 استيراد من إكسل <input type="file" id="excelImportFile" accept=".xlsx, .xls" style="display:none;" onchange="importSchoolClassesFromExcel(event)">
+                            </label>
+                        </div>
+                    </div>
+
+                    <table id="schoolTable">
+                        <thead>
+                            <tr>
+                                <th>اسم الفصل</th>
+                                <th>عدد الطلاب</th>
+                                <th><span class="day-title-blue" id="th_title_sun">الأحد</span><span class="day-date" id="hdr_date_sun">--</span><button class="day-toggle" id="btnSun" onclick="toggleHoliday('sun')">دراسة</button></th>
+                                <th><span class="day-title-blue" id="th_title_mon">الاثنين</span><span class="day-date" id="hdr_date_mon">--</span><button class="day-toggle" id="btnMon" onclick="toggleHoliday('mon')">دراسة</button></th>
+                                <th><span class="day-title-blue" id="th_title_tue">الثلاثاء</span><span class="day-date" id="hdr_date_tue">--</span><button class="day-toggle" id="btnTue" onclick="toggleHoliday('tue')">دراسة</button></th>
+                                <th><span class="day-title-blue" id="th_title_wed">الأربعاء</span><span class="day-date" id="hdr_date_wed">--</span><button class="day-toggle" id="btnWed" onclick="toggleHoliday('wed')">دراسة</button></th>
+                                <th><span class="day-title-blue" id="th_title_thu">الخميس</span><span class="day-date" id="hdr_date_thu">--</span><button class="day-toggle" id="btnThu" onclick="toggleHoliday('thu')">دراسة</button></th>
+                                <th id="th-action-col">الإجراء</th>
+                            </tr>
+                        </thead>
+                        <tbody id="schoolTbody"></tbody>
+                    </table>
+
+                    <h4 style="margin-top:15px; color:var(--purple-dark); font-size:0.88rem;">📊 إحصائية الانضباط والغياب للفترة</h4>
+                    <table class="stats-table">
+                        <thead>
+                            <tr>
+                                <th>البيان</th>
+                                <th>الفترة (تراكمي)</th>
+                                <th>الأحد</th>
+                                <th>الاثنين</th>
+                                <th>الثلاثاء</th>
+                                <th>الأربعاء</th>
+                                <th>الخميس</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="background:#FFFDF0;">عدد الطلاب</td>
+                                <td id="stat_students_week">-</td>
+                                <td id="stat_students_sun">-</td>
+                                <td id="stat_students_mon">-</td>
+                                <td id="stat_students_tue">-</td>
+                                <td id="stat_students_wed">-</td>
+                                <td id="stat_students_thu">-</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#FFFDF0;">الحضور</td>
+                                <td id="stat_present_week">-</td>
+                                <td id="stat_present_sun">-</td>
+                                <td id="stat_present_mon">-</td>
+                                <td id="stat_present_tue">-</td>
+                                <td id="stat_present_wed">-</td>
+                                <td id="stat_present_thu">-</td>
+                            </tr>
+                            <tr>
+                                <td style="background:#FFFDF0;">الغياب</td>
+                                <td id="stat_absent_week">-</td>
+                                <td id="stat_absent_sun">-</td>
+                                <td id="stat_absent_mon">-</td>
+                                <td id="stat_absent_tue">-</td>
+                                <td id="stat_absent_wed">-</td>
+                                <td id="stat_absent_thu">-</td>
+                            </tr>
+                            <tr class="discipline-row">
+                                <td>نسبة الانضباط</td>
+                                <td id="stat_rate_week">-</td>
+                                <td id="stat_rate_sun">-</td>
+                                <td id="stat_rate_mon">-</td>
+                                <td id="stat_rate_tue">-</td>
+                                <td id="stat_rate_wed">-</td>
+                                <td id="stat_rate_thu">-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-perms" style="display:none;">
+                <div class="view-title"><span>🔑 إدارة الصلاحيات الاستثنائية للأسابيع السابقة</span></div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>المستخدم / المدرسة</th><th>الدور</th><th>منح صلاحية التعديل في الأسابيع السابقة</th></tr>
+                        </thead>
+                        <tbody id="permsTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div id="view-users" style="display:none;">
+                <div class="view-title"><span>👤 إدارة حسابات المدارس والمستخدمين</span></div>
+                <div class="filter-card">
+                    <form onsubmit="addNewUser(event)" style="display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:10px; align-items:end;">
+                        <div class="filter-item"><label>اسم المستخدم (Login)</label><input type="text" id="newUsername" required style="padding:5px;"></div>
+                        <div class="filter-item">
+                            <label>نوع الحساب</label>
+                            <select id="newRole" onchange="handleRoleChange()" style="padding:5px;">
+                                <option value="SCHOOL">حساب مدرسة</option>
+                                <option value="MANAGER">مدير مجمع</option>
+                                <option value="SUPER_ADMIN">المشرف العام</option>
+                                <option value="SUPERVISOR">مشرف / مشرفـة</option>
+                            </select>
+                        </div>
+                        <div class="filter-item"><label>المدرسة / النطاق</label><select id="newSchoolId" required style="padding:5px;"></select></div>
+                        <div class="filter-item"><label>كلمة المرور</label><input type="password" id="newPassword" required style="padding:5px;"></div>
+                        <div><button type="submit" class="btn-add" style="width:100%;">إضافة مستخدم</button></div>
+                    </form>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr><th>اسم المستخدم</th><th>نوع الحساب</th><th>المدرسة / النطاق</th><th>كلمة المرور</th><th>الإجراء</th></tr>
+                        </thead>
+                        <tbody id="usersTbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <footer class="app-footer">
+            برمجة الشؤون التعليمية بمدارس الشارقة الأهلية © 2026
+        </footer>
+    </div>
+
+    <script>
+        const schoolWeeksData = {
+            term1: [
+                { week: 1, label: 'الأسبوع 1', start: '2026-08-23', end: '2026-08-27' },
+                { week: 2, label: 'الأسبوع 2', start: '2026-08-30', end: '2026-09-03' },
+                { week: 3, label: 'الأسبوع 3', start: '2026-09-06', end: '2026-09-10' },
+                { week: 4, label: 'الأسبوع 4', start: '2026-09-13', end: '2026-09-17' },
+                { week: 5, label: 'الأسبوع 5', start: '2026-09-20', end: '2026-09-24' },
+                { week: 6, label: 'الأسبوع 6', start: '2026-09-27', end: '2026-10-01' },
+                { week: 7, label: 'الأسبوع 7 (الأسبوع الحالي)', start: '2026-10-04', end: '2026-10-08' },
+                { week: 8, label: 'الأسبوع 8', start: '2026-10-11', end: '2026-10-15' },
+                { week: 9, label: 'الأسبوع 9', start: '2026-10-18', end: '2026-10-22' },
+                { week: 10, label: 'الأسبوع 10', start: '2026-10-25', end: '2026-10-29' },
+                { week: 11, label: 'الأسبوع 11', start: '2026-11-01', end: '2026-11-05' },
+                { week: 12, label: 'الأسبوع 12', start: '2026-11-08', end: '2026-11-12' },
+                { week: 13, label: 'الأسبوع 13', start: '2026-11-15', end: '2026-11-19' },
+                { week: 14, label: 'الأسبوع 14', start: '2026-11-22', end: '2026-11-26' },
+                { week: 15, label: 'الأسبوع 15', start: '2026-11-29', end: '2026-12-03' },
+                { week: 16, label: 'الأسبوع 16', start: '2026-12-06', end: '2026-12-10' },
+                { week: 17, label: 'الأسبوع 17', start: '2026-12-13', end: '2026-12-17' },
+                { week: 18, label: 'الأسبوع 18', start: '2026-12-20', end: '2026-12-24' },
+                { week: 19, label: 'الأسبوع 19 (الاختبارات)', start: '2026-12-27', end: '2027-01-07' }
+            ],
+            term2: [
+                { week: 1, label: 'الأسبوع 1 (ف2)', start: '2027-01-17', end: '2027-01-21' },
+                { week: 2, label: 'الأسبوع 2 (ف2)', start: '2027-01-24', end: '2027-01-28' },
+                { week: 3, label: 'الأسبوع 3 (ف2)', start: '2027-01-31', end: '2027-02-04' },
+                { week: 4, label: 'الأسبوع 4 (ف2)', start: '2027-02-07', end: '2027-02-11' },
+                { week: 5, label: 'الأسبوع 5 (ف2)', start: '2027-02-14', end: '2027-02-18' },
+                { week: 6, label: 'الأسبوع 6 (ف2)', start: '2027-02-21', end: '2027-02-25' },
+                { week: 7, label: 'الأسبوع 7 (ف2)', start: '2027-02-28', end: '2027-03-04' },
+                { week: 8, label: 'الأسبوع 8 (ف2)', start: '2027-03-07', end: '2027-03-11' },
+                { week: 9, label: 'الأسبوع 9 (ف2)', start: '2027-03-14', end: '2027-03-18' },
+                { week: 10, label: 'الأسبوع 10 (ف2)', start: '2027-03-21', end: '2027-03-25' },
+                { week: 11, label: 'الأسبوع 11 (ف2)', start: '2027-03-28', end: '2027-04-01' },
+                { week: 12, label: 'الأسبوع 12 (ف2)', start: '2027-04-04', end: '2027-04-08' },
+                { week: 13, label: 'الأسبوع 13 (ف2)', start: '2027-04-11', end: '2027-04-15' },
+                { week: 14, label: 'الأسبوع 14 (ف2)', start: '2027-04-18', end: '2027-04-22' },
+                { week: 15, label: 'الأسبوع 15 (ف2)', start: '2027-04-25', end: '2027-04-29' },
+                { week: 16, label: 'الأسبوع 16 (ف2)', start: '2027-05-02', end: '2027-05-06' },
+                { week: 17, label: 'الأسبوع 17 (ف2)', start: '2027-05-23', end: '2027-05-27' },
+                { week: 18, label: 'الأسبوع 18 (ف2)', start: '2027-05-30', end: '2027-06-03' },
+                { week: 19, label: 'الأسبوع 19 (الاختبارات ف2)', start: '2027-06-06', end: '2027-06-24' }
+            ]
+        };
+
+        // تحميل البيانات المحفوظة تلقائياً أو استخدام الافتراضية
+        let schoolsData = JSON.parse(localStorage.getItem('sharjah_schools_data')) || [
+            { id: 'h_b_p', branch: 'الحزم', section: 'بنين', grade: 'ابتدائي', name: 'الحزم - بنين - ابتدائي', classes: [{name:'أول/1', students: 25}, {name:'ثاني/1', students: 28}, {name:'ثالث/1', students: 26}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_b_m', branch: 'الحزم', section: 'بنين', grade: 'متوسط', name: 'الحزم - بنين - متوسط', classes: [{name:'أول متوسط/1', students: 30}, {name:'ثاني متوسط/1', students: 28}], absent: {sun:1, mon:0, tue:0, wed:1, thu:0} },
+            { id: 'h_b_s', branch: 'الحزم', section: 'بنين', grade: 'ثانوي', name: 'الحزم - بنين - ثانوي', classes: [{name:'أول ثانوي/1', students: 32}, {name:'ثاني ثانوي/1', students: 29}], absent: {sun:0, mon:1, tue:0, wed:0, thu:1} },
+            { id: 'h_g_k', branch: 'الحزم', section: 'بنات', grade: 'رياض أطفال', name: 'الحزم - بنات - رياض أطفال', classes: [{name:'روضة أولى', students: 20}, {name:'روضة ثانية', students: 22}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_g_p', branch: 'الحزم', section: 'بنات', grade: 'ابتدائي', name: 'الحزم - بنات - ابتدائي', classes: [{name:'أول/1 بنات', students: 24}, {name:'ثاني/1 بنات', students: 25}], absent: {sun:1, mon:0, tue:1, wed:0, thu:0} },
+            { id: 'h_g_m', branch: 'الحزم', section: 'بنات', grade: 'متوسط', name: 'الحزم - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات', students: 29}, {name:'ثاني متوسط/1 بنات', students: 27}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 'h_g_s', branch: 'الحزم', section: 'بنات', grade: 'ثانوي', name: 'الحزم - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات', students: 31}, {name:'ثاني ثانوي/1 بنات', students: 30}], absent: {sun:0, mon:1, tue:0, wed:1, thu:0} },
+            { id: 't_b_p', branch: 'طويق', section: 'بنين', grade: 'ابتدائي', name: 'طويق - بنين - ابتدائي', classes: [{name:'أول/1 طويق', students: 26}, {name:'ثاني/1 طويق', students: 25}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_b_m', branch: 'طويق', section: 'بنين', grade: 'متوسط', name: 'طويق - بنين - متوسط', classes: [{name:'أول متوسط/1 طويق', students: 28}, {name:'ثاني متوسط/1 طويق', students: 26}], absent: {sun:1, mon:1, tue:0, wed:0, thu:0} },
+            { id: 't_b_s', branch: 'طويق', section: 'بنين', grade: 'ثانوي', name: 'طويق - بنين - ثانوي', classes: [{name:'أول ثانوي/1 طويق', students: 30}, {name:'ثاني ثانوي/1 طويق', students: 28}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_k', branch: 'طويق', section: 'بنات', grade: 'رياض أطفال', name: 'طويق - بنات - رياض أطفال', classes: [{name:'روضة/1 طويق', students: 18}, {name:'روضة/2 طويق', students: 20}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_p', branch: 'طويق', section: 'بنات', grade: 'ابتدائي', name: 'طويق - بنات - ابتدائي', classes: [{name:'أول/1 بنات طويق', students: 22}, {name:'ثاني/1 بنات طويق', students: 24}], absent: {sun:0, mon:0, tue:1, wed:0, thu:0} },
+            { id: 't_g_m', branch: 'طويق', section: 'بنات', grade: 'متوسط', name: 'طويق - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات طويق', students: 27}, {name:'ثاني متوسط/1 بنات طويق', students: 25}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
+            { id: 't_g_s', branch: 'طويق', section: 'بنات', grade: 'ثانوي', name: 'طويق - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات طويق', students: 29}, {name:'ثاني ثانوي/1 بنات طويق', students: 28}], absent: {sun:0, mon:0, tue:0, wed:1, thu:0} }
+        ];
+
+        let users = JSON.parse(localStorage.getItem('sharjah_users_data')) || [
+            { username: 'admin', pass: 'admin123', role: 'SUPER_ADMIN', name: 'المشرف العام', allowPastEdit: true },
+            { username: 'edu_head', pass: 'edu123', role: 'MANAGER', name: 'مشرف الشؤون التعليمية', allowPastEdit: true },
+            { username: 'hazm_dir', pass: 'dir123', role: 'MANAGER', branch: 'الحزم', name: 'مدير مجمع الحزم', allowPastEdit: false },
+            { username: 'tuwaiq_dir', pass: 'dir123', role: 'MANAGER', branch: 'طويق', name: 'مدير مجمع طويق', allowPastEdit: false },
+            { username: 'supervisor_boys', pass: 'sup123', role: 'SUPERVISOR', section: 'بنين', name: 'مشرف قطاع البنين', allowPastEdit: false },
+            { username: 'supervisor_girls', pass: 'sup123', role: 'SUPERVISOR', section: 'بنات', name: 'مشرفة قطاع البنات', allowPastEdit: false },
+            { username: 'hazm_b_pri', pass: 'school123', role: 'SCHOOL', schoolId: 'h_b_p', name: 'الحزم - بنين - ابتدائي', allowPastEdit: false },
+            { username: 'hazm_b_mid', pass: 'school123', role: 'SCHOOL', schoolId: 'h_b_m', name: 'الحزم - بنين - متوسط', allowPastEdit: false },
+            { username: 'hazm_b_sec', pass: 'school123', role: 'SCHOOL', schoolId: 'h_b_s', name: 'الحزم - بنين - ثانوي', allowPastEdit: false },
+            { username: 'hazm_g_kg', pass: 'school123', role: 'SCHOOL', schoolId: 'h_g_k', name: 'الحزم - بنات - رياض أطفال', allowPastEdit: false },
+            { username: 'hazm_g_pri', pass: 'school123', role: 'SCHOOL', schoolId: 'h_g_p', name: 'الحزم - بنات - ابتدائي', allowPastEdit: false },
+            { username: 'hazm_g_mid', pass: 'school123', role: 'SCHOOL', schoolId: 'h_g_m', name: 'الحزم - بنات - متوسط', allowPastEdit: false },
+            { username: 'hazm_g_sec', pass: 'school123', role: 'SCHOOL', schoolId: 'h_g_s', name: 'الحزم - بنات - ثانوي', allowPastEdit: false },
+            { username: 'tuwaiq_b_pri', pass: 'school123', role: 'SCHOOL', schoolId: 't_b_p', name: 'طويق - بنين - ابتدائي', allowPastEdit: false },
+            { username: 'tuwaiq_b_mid', pass: 'school123', role: 'SCHOOL', schoolId: 't_b_m', name: 'طويق - بنين - متوسط', allowPastEdit: false },
+            { username: 'tuwaiq_b_sec', pass: 'school123', role: 'SCHOOL', schoolId: 't_b_s', name: 'طويق - بنين - ثانوي', allowPastEdit: false },
+            { username: 'tuwaiq_g_kg', pass: 'school123', role: 'SCHOOL', schoolId: 't_g_k', name: 'طويق - بنات - رياض أطفال', allowPastEdit: false },
+            { username: 'tuwaiq_g_pri', pass: 'school123', role: 'SCHOOL', schoolId: 't_g_p', name: 'طويق - بنات - ابتدائي', allowPastEdit: false },
+            { username: 'tuwaiq_g_mid', pass: 'school123', role: 'SCHOOL', schoolId: 't_g_m', name: 'طويق - بنات - متوسط', allowPastEdit: false },
+            { username: 'tuwaiq_g_sec', pass: 'school123', role: 'SCHOOL', schoolId: 't_g_s', name: 'طويق - بنات - ثانوي', allowPastEdit: false }
+        ];
+
+        let currentUser = null;
+        let currentActiveSchoolId = null;
+        let holidays = { sun: false, mon: false, tue: false, wed: false, thu: false };
+        let currentActiveWeekCode = 't1_w7';
+        let currentPage = 1;
+
+        // دالة الحفظ التلقائي في المتصفح
+        function saveDataToStorage() {
+            localStorage.setItem('sharjah_schools_data', JSON.stringify(schoolsData));
+            localStorage.setItem('sharjah_users_data', JSON.stringify(users));
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            onTermChange();
+            populateSchoolOptions();
+            renderUsersList();
+            renderPermsList();
+        });
+
+        function onTermChange() {
+            const termVal = document.getElementById('termSelect').value;
+            const weekSelect = document.getElementById('weekSelect');
+            if(!weekSelect) return;
+            weekSelect.innerHTML = '';
+            
+            let optAll = document.createElement('option');
+            optAll.value = 'ALL';
+            optAll.innerText = 'جميع الأسابيع';
+            weekSelect.appendChild(optAll);
+
+            let weeksList = [];
+            if(termVal === 'ALL') {
+                weeksList = [...schoolWeeksData.term1, ...schoolWeeksData.term2];
+            } else {
+                weeksList = termVal === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
+            }
+
+            weeksList.forEach((w, idx) => {
+                let opt = document.createElement('option');
+                opt.value = `t${termVal}_w${w.week}_${idx}`;
+                opt.innerText = w.label;
+                if(termVal === '1' && w.week === 7) opt.selected = true;
+                weekSelect.appendChild(opt);
+            });
+            onWeekChange();
+        }
+
+        function onWeekChange() {
+            const weekSelect = document.getElementById('weekSelect');
+            if(!weekSelect) return;
+            const weekVal = weekSelect.value;
+            if(!weekVal || weekVal === 'ALL') {
+                let sSun = document.getElementById('date_sun');
+                let sThu = document.getElementById('date_thu');
+                if(sSun) sSun.value = '2026-08-23';
+                if(sThu) sThu.value = '2027-06-24';
+                updateDatesHeader();
+                return;
+            }
+            let weekNum = parseInt(weekVal.split('_')[1].replace('w', ''));
+            let activeTerm = weekVal.includes('t2') ? '2' : '1';
+            let weeksList = activeTerm === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
+            let wkObj = weeksList.find(w => w.week === weekNum);
+            if(wkObj) {
+                let sSun = document.getElementById('date_sun');
+                let sThu = document.getElementById('date_thu');
+                if(sSun) sSun.value = wkObj.start;
+                if(sThu) sThu.value = wkObj.end;
+                currentPage = 1;
+                updateDatesHeader();
+            }
+        }
+
+        function resetToCurrentWeek() {
+            let termSel = document.getElementById('termSelect');
+            if(termSel) termSel.value = '1';
+            onTermChange();
+            let weekSel = document.getElementById('weekSelect');
+            if(weekSel) weekSel.value = 't1_w7_6';
+            onWeekChange();
+        }
+
+        function navigateWeek(direction) {
+            const weekSelect = document.getElementById('weekSelect');
+            if(!weekSelect) return;
+            let idx = weekSelect.selectedIndex;
+            if(idx + direction >= 0 && idx + direction < weekSelect.options.length) {
+                weekSelect.selectedIndex = idx + direction;
+                onWeekChange();
+            }
+        }
+
+        function goHomeMain() {
+            showView('view-main', document.querySelector('.sidebar-menu a'));
+            backToDashboard();
+        }
+
+        function onSectionFilterChange() {
+            let sectionSel = document.getElementById('sb-section');
+            let gradeSelect = document.getElementById('sb-grade');
+            if(!sectionSel || !gradeSelect) return;
+
+            let sectionVal = sectionSel.value;
+            let currentGrade = gradeSelect.value;
+            gradeSelect.innerHTML = '';
+
+            let defaultOpt = document.createElement('option');
+            defaultOpt.value = 'ALL';
+            defaultOpt.innerText = 'جميع المراحل';
+            gradeSelect.appendChild(defaultOpt);
+
+            let grades = [];
+            if(sectionVal === 'بنين') {
+                grades = ['ابتدائي', 'متوسط', 'ثانوي'];
+            } else if(sectionVal === 'بنات') {
+                grades = ['رياض أطفال', 'ابتدائي', 'متوسط', 'ثانوي'];
+            } else {
+                grades = ['رياض أطفال', 'ابتدائي', 'متوسط', 'ثانوي'];
+            }
+
+            grades.forEach(g => {
+                let opt = document.createElement('option');
+                opt.value = g;
+                opt.innerText = g;
+                if(g === currentGrade) opt.selected = true;
+                gradeSelect.appendChild(opt);
+            });
+
+            renderDashboard();
+        }
+
+        function updateDatesHeader() {
+            let startInput = document.getElementById('date_sun');
+            let endInput = document.getElementById('date_thu');
+            if(!startInput || !startInput.value) return;
+            let startDate = new Date(startInput.value);
+            let endDate = (endInput && endInput.value) ? new Date(endInput.value) : new Date(startDate);
+
+            const arabicDays = ['الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة', 'السبت'];
+            const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+            
+            let startDayName = arabicDays[startDate.getDay()];
+            let endDayName = arabicDays[endDate.getDay()];
+            let lblStart = document.getElementById('label_date_start');
+            let lblEnd = document.getElementById('label_date_end');
+            if(lblStart) lblStart.innerText = `${startDayName}:`;
+            if(lblEnd) lblEnd.innerText = `${endDayName}:`;
+
+            dayKeys.forEach((key, index) => {
+                let d = new Date(startDate);
+                d.setDate(d.getDate() + ((currentPage - 1) * 5) + index);
+                
+                let dayName = arabicDays[d.getDay()]; 
+                let formattedDate = `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()}`;
+                
+                let thTitle = document.getElementById(`th_title_${key}`);
+                let dashTitle = document.getElementById(`dash_title_${key}`);
+                let stHeader = document.getElementById(`st_h_${index+1}`);
+                
+                if(thTitle) thTitle.innerText = dayName;
+                if(dashTitle) dashTitle.innerText = dayName;
+                if(stHeader) stHeader.innerText = dayName;
+                
+                let hdrElem = document.getElementById(`hdr_date_${key}`);
+                let dashElem = document.getElementById(`dash_date_${key}`);
+                if(hdrElem) hdrElem.innerText = formattedDate;
+                if(dashElem) dashElem.innerText = formattedDate;
+            });
+
+            renderPaginationControls(startDate, endDate);
+            checkWeekPermissions();
+            if(currentUser) {
+                let dashView = document.getElementById('dashboardView');
+                if(dashView && dashView.style.display !== 'none') {
+                    renderDashboard();
+                } else if(currentActiveSchoolId) {
+                    calculateStats();
+                }
+            }
+        }
+
+        function renderPaginationControls(startDate, endDate) {
+            let diffTime = Math.abs(endDate - startDate);
+            let diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            let totalPages = Math.max(1, Math.ceil(diffDays / 5));
+
+            let box = document.getElementById('paginationBox');
+            if(!box) return;
+            box.innerHTML = '';
+
+            for(let i = 1; i <= totalPages; i++) {
+                let btn = document.createElement('button');
+                btn.className = `page-btn ${currentPage === i ? 'active' : ''}`;
+                btn.innerText = i;
+                btn.onclick = () => {
+                    currentPage = i;
+                    updateDatesHeader();
+                };
+                box.appendChild(btn);
+            }
+        }
+
+        function checkWeekPermissions() {
+            let weekSel = document.getElementById('weekSelect');
+            if(!weekSel) return true;
+            let selectedWeek = weekSel.value;
+            let banner = document.getElementById('alert-banner');
+            let actionBox = document.getElementById('school-action-box');
+            let actionTh = document.getElementById('th-action-col');
+
+            let allowEdit = true;
+
+            if (currentUser && (currentUser.role === 'SUPER_ADMIN' || currentUser.username === 'edu_head')) {
+                allowEdit = true;
+                if(banner) banner.style.display = 'none';
+            } else if (selectedWeek < currentActiveWeekCode && selectedWeek !== 'ALL') {
+                if (currentUser && currentUser.allowPastEdit) {
+                    allowEdit = true;
+                    if(banner) {
+                        banner.style.display = 'block';
+                        banner.innerText = '🔓 ملاحظة: أنت تستعرض أسبوعاً سابقاً مع وجود صلاحية استثنائية بالتعديل.';
+                    }
+                } else {
+                    allowEdit = false;
+                    if(banner) {
+                        banner.style.display = 'block';
+                        banner.innerText = '⚠️ تنبيه: أنت تستعرض أسبوعاً سابقاً. وضع التعديل مقفل (للقراءة فقط).';
+                    }
+                }
+            } else {
+                if(banner) banner.style.display = 'none';
+            }
+
+            if(actionBox) actionBox.style.display = allowEdit ? 'flex' : 'none';
+            if(actionTh) actionTh.style.display = allowEdit ? 'table-cell' : 'none';
+
+            return allowEdit;
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const uInput = document.getElementById('login-user');
+            const pInput = document.getElementById('login-pass');
+            if(!uInput || !pInput) return;
+            const u = uInput.value.trim().toLowerCase();
+            const p = pInput.value.trim();
+            const found = users.find(x => x.username.toLowerCase() === u && x.pass === p);
+            if(found) {
+                currentUser = found;
+                let overlay = document.getElementById('login-overlay');
+                let sidebar = document.getElementById('sidebar-nav');
+                let topbar = document.getElementById('topbar-header');
+                let contentArea = document.getElementById('content-area-main');
+                let badge = document.getElementById('user-badge-info');
+
+                if(overlay) overlay.style.display = 'none';
+                if(sidebar) sidebar.style.display = 'flex';
+                if(topbar) topbar.style.display = 'flex';
+                if(contentArea) contentArea.style.display = 'block';
+                if(badge) badge.innerText = `${currentUser.name} (${getRoleTitle(currentUser.role)})`;
+                
+                applyRoleFiltersOnLogin();
+                setupView();
+            } else {
+                alert('⚠️ اسم المستخدم أو كلمة المرور غير صحيحة.');
+            }
+        }
+
+        function applyRoleFiltersOnLogin() {
+            let branchSel = document.getElementById('sb-branch');
+            let sectionSel = document.getElementById('sb-section');
+            let gradeSel = document.getElementById('sb-grade');
+
+            if(branchSel) branchSel.value = 'ALL';
+            if(sectionSel) sectionSel.value = 'ALL';
+            if(gradeSel) gradeSel.value = 'ALL';
+            onSectionFilterChange();
+
+            if(currentUser.role === 'MANAGER' && currentUser.branch) {
+                if(branchSel) branchSel.value = currentUser.branch;
+            } else if(currentUser.role === 'SUPERVISOR' && currentUser.section) {
+                if(sectionSel) sectionSel.value = currentUser.section;
+                onSectionFilterChange();
+            }
+        }
+
+        function getRoleTitle(role) {
+            if(role === 'SUPER_ADMIN') return 'المشرف العام';
+            if(role === 'MANAGER') return 'مدير مجمع';
+            if(role === 'SUPERVISOR') return 'مشرف القطاع';
+            return 'حساب مدرسة';
+        }
+
+        function logout() {
+            currentUser = null;
+            currentActiveSchoolId = null;
+            let uInput = document.getElementById('login-user');
+            let pInput = document.getElementById('login-pass');
+            if(uInput) uInput.value = '';
+            if(pInput) pInput.value = '';
+            let overlay = document.getElementById('login-overlay');
+            let sidebar = document.getElementById('sidebar-nav');
+            let topbar = document.getElementById('topbar-header');
+            let contentArea = document.getElementById('content-area-main');
+
+            if(overlay) overlay.style.display = 'flex';
+            if(sidebar) sidebar.style.display = 'none';
+            if(topbar) topbar.style.display = 'none';
+            if(contentArea) contentArea.style.display = 'none';
+        }
+
+        function setupView() {
+            const perms = currentUser.role;
+            let usersLi = document.getElementById('menu-users-li');
+            let permsLi = document.getElementById('menu-perms-li');
+            let filtersBox = document.getElementById('sidebar-filters-box');
+
+            if(usersLi) usersLi.style.display = (perms === 'SUPER_ADMIN' || perms === 'MANAGER') ? 'block' : 'none';
+            if(permsLi) permsLi.style.display = (perms === 'SUPER_ADMIN' || perms === 'MANAGER') ? 'block' : 'none';
+            if(filtersBox) filtersBox.style.display = (perms !== 'SCHOOL') ? 'block' : 'none';
+
+            if(perms === 'SCHOOL') {
+                renderSchoolTable(currentUser.schoolId);
+            } else {
+                backToDashboard();
+            }
+
+            if(perms === 'SUPER_ADMIN' || perms === 'MANAGER') {
+                renderUsersList();
+                renderPermsList();
+            }
+        }
+
+        function showView(viewId, elem) {
+            ['view-main', 'view-perms', 'view-users'].forEach(v => {
+                let el = document.getElementById(v);
+                if(el) el.style.display = 'none';
+            });
+            let targetView = document.getElementById(viewId);
+            if(targetView) targetView.style.display = 'block';
+            document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
+            if(elem) elem.classList.add('active');
+        }
+
+        function renderSchoolTable(schoolId) {
+            currentActiveSchoolId = schoolId;
+            let dashView = document.getElementById('dashboardView');
+            let schoolView = document.getElementById('schoolTableView');
+            if(dashView) dashView.style.display = 'none';
+            if(schoolView) schoolView.style.display = 'block';
+
+            const school = schoolsData.find(s => s.id === schoolId);
+            let heading = document.getElementById('main-view-heading');
+            if(heading && school) heading.innerText = `متابعة الغياب والانضباط - ${school.name}`;
+            const tbody = document.getElementById('schoolTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            let canEdit = checkWeekPermissions();
+            if(currentUser.role === 'SUPER_ADMIN' || currentUser.username === 'edu_head') canEdit = true;
+            if(currentUser.role === 'SCHOOL') canEdit = true;
+
+            if(school && (!school.classes || school.classes.length === 0)) {
+                school.classes = [{name:'أول/1', students: 25}];
+            }
+            if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
+
+            school.classes.forEach((cls, idx) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!canEdit?'readonly':''} onchange="updateClassName(this, '${schoolId}', ${idx})"></td>
+                    <td><input type="number" class="input-absent" value="${cls.students}" ${!canEdit?'readonly':''} onchange="updateClassStudents(this, '${schoolId}', ${idx})"></td>
+                    <td><input type="number" class="input-absent ${holidays.sun?'input-disabled':''}" ${holidays.sun || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.sun : ''}" oninput="updateSchoolAbsent('${schoolId}', 'sun', this)"></td>
+                    <td><input type="number" class="input-absent ${holidays.mon?'input-disabled':''}" ${holidays.mon || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.mon : ''}" oninput="updateSchoolAbsent('${schoolId}', 'mon', this)"></td>
+                    <td><input type="number" class="input-absent ${holidays.tue?'input-disabled':''}" ${holidays.tue || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.tue : ''}" oninput="updateSchoolAbsent('${schoolId}', 'tue', this)"></td>
+                    <td><input type="number" class="input-absent ${holidays.wed?'input-disabled':''}" ${holidays.wed || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.wed : ''}" oninput="updateSchoolAbsent('${schoolId}', 'wed', this)"></td>
+                    <td><input type="number" class="input-absent ${holidays.thu?'input-disabled':''}" ${holidays.thu || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.thu : ''}" oninput="updateSchoolAbsent('${schoolId}', 'thu', this)"></td>
+                    <td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateDatesHeader();
+            calculateStats();
+        }
+
+        function updateSchoolAbsent(schoolId, day, input) {
+            let school = schoolsData.find(s => s.id === schoolId);
+            if(school) {
+                if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
+                school.absent[day] = parseInt(input.value) || 0;
+                saveDataToStorage(); // حفظ تلقائي
+                calculateStats();
+            }
+        }
+
+        function updateClassName(input, schoolId, index) {
+            let school = schoolsData.find(s => s.id === schoolId);
+            if(school && school.classes[index]) {
+                school.classes[index].name = input.value.trim();
+                saveDataToStorage(); // حفظ تلقائي
+            }
+        }
+
+        function updateClassStudents(input, schoolId, index) {
+            let school = schoolsData.find(s => s.id === schoolId);
+            if(school && school.classes[index]) {
+                school.classes[index].students = parseInt(input.value) || 0;
+                saveDataToStorage(); // حفظ تلقائي
+                calculateStats();
+            }
+        }
+
+        function addNewClassToSchool() {
+            let nameInput = document.getElementById('newClassNameInput');
+            let studInput = document.getElementById('newClassStudentsInput');
+            if(!nameInput) return;
+            let cName = nameInput.value.trim();
+            let cStudents = studInput ? (parseInt(studInput.value) || 25) : 25;
+            if(!cName) { alert('يرجى إدخال اسم الفصل.'); return; }
+            let targetId = currentActiveSchoolId;
+            let school = schoolsData.find(s => s.id === targetId);
+            if(!school) { alert('⚠️ يرجى اختيار المدرسة أولاً.'); return; }
+            if(!school.classes) school.classes = [];
+            school.classes.push({ name: cName, students: cStudents });
+            saveDataToStorage(); // حفظ تلقائي
+            nameInput.value = '';
+            renderSchoolTable(school.id);
+        }
+
+        function deleteClassRow(schoolId, index) {
+            let school = schoolsData.find(s => s.id === schoolId);
+            if(school && school.classes.length > 1) {
+                if(confirm('هل أنت متأكد من حذف هذا الفصل؟')) {
+                    school.classes.splice(index, 1);
+                    saveDataToStorage(); // حفظ تلقائي
+                    renderSchoolTable(schoolId);
+                }
+            } else {
+                alert('يجب أن يبقى فصل واحد على الأقل.');
+            }
+        }
+
+        function toggleHoliday(day) {
+            holidays[day] = !holidays[day];
+            let btn = document.getElementById(`btn${day.charAt(0).toUpperCase() + day.slice(1)}`);
+            if(btn) {
+                if(holidays[day]) { btn.classList.add('holiday'); btn.innerText = 'إجازة'; }
+                else { btn.classList.remove('holiday'); btn.innerText = 'دراسة'; }
+            }
+            if(currentActiveSchoolId) renderSchoolTable(currentActiveSchoolId);
+        }
+
+        function calculateStats() {
+            const tbody = document.getElementById('schoolTbody');
+            if(!tbody) return;
+            let totalStudents = 0;
+            const school = schoolsData.find(s => s.id === currentActiveSchoolId);
+
+            Array.from(tbody.rows).forEach(row => {
+                let students = parseInt(row.cells[1].children[0].value) || 0;
+                totalStudents += students;
+            });
+
+            let dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+            let cumAbsent = 0, activeDays = 0;
+
+            dayKeys.forEach(key => {
+                let abs = school && school.absent ? (school.absent[key] || 0) : 0;
+                let sElem = document.getElementById(`stat_students_${key}`);
+                let pElem = document.getElementById(`stat_present_${key}`);
+                let aElem = document.getElementById(`stat_absent_${key}`);
+                let rElem = document.getElementById(`stat_rate_${key}`);
+
+                if(holidays[key]) {
+                    if(sElem) sElem.innerText = '-';
+                    if(pElem) pElem.innerText = '-';
+                    if(aElem) aElem.innerText = '-';
+                    if(rElem) rElem.innerText = 'إجازة (مستبعد)';
+                } else {
+                    activeDays++;
+                    cumAbsent += abs;
+                    let pres = totalStudents - abs;
+                    let rate = totalStudents > 0 ? ((pres / totalStudents) * 100).toFixed(2) : '100.00';
+                    if(sElem) sElem.innerText = totalStudents;
+                    if(pElem) pElem.innerText = pres;
+                    if(aElem) aElem.innerText = abs;
+                    if(rElem) rElem.innerText = `${rate}%`;
+                }
+            });
+
+            let swElem = document.getElementById('stat_students_week');
+            let pwElem = document.getElementById('stat_present_week');
+            let awElem = document.getElementById('stat_absent_week');
+            let rwElem = document.getElementById('stat_rate_week');
+
+            if(activeDays > 0) {
+                let totalPossible = totalStudents * activeDays;
+                let totalPres = totalPossible - cumAbsent;
+                let weekRate = totalPossible > 0 ? ((totalPres / totalPossible) * 100).toFixed(2) : '100.00';
+                if(swElem) swElem.innerText = totalStudents;
+                if(pwElem) pwElem.innerText = '-';
+                if(awElem) awElem.innerText = '-';
+                if(rwElem) rwElem.innerText = `${weekRate}%`;
+            } else {
+                if(swElem) swElem.innerText = '-';
+                if(pwElem) pwElem.innerText = '-';
+                if(awElem) awElem.innerText = '-';
+                if(rwElem) rwElem.innerText = '-';
+            }
+        }
+
+        function renderDashboard() {
+            let heading = document.getElementById('main-view-heading');
+            if(heading) heading.innerText = 'لوحة ترتيب الأقسام والمتابعة';
+            const tbody = document.getElementById('dashboardTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+
+            let branchSel = document.getElementById('sb-branch');
+            let sectionSel = document.getElementById('sb-section');
+            let gradeSel = document.getElementById('sb-grade');
+
+            let branchVal = branchSel ? branchSel.value : 'ALL';
+            let sectionVal = sectionSel ? sectionSel.value : 'ALL';
+            let gradeVal = gradeSel ? gradeSel.value : 'ALL';
+
+            if (currentUser && currentUser.role === 'MANAGER' && currentUser.branch) {
+                branchVal = currentUser.branch;
+                if(branchSel) { branchSel.value = currentUser.branch; branchSel.disabled = true; }
+            } else if (currentUser && currentUser.role === 'SUPERVISOR' && currentUser.section) {
+                sectionVal = currentUser.section;
+                if(sectionSel) { sectionSel.value = currentUser.section; sectionSel.disabled = true; }
+            }
+
+            let list = [...schoolsData];
+            if(branchVal !== 'ALL') list = list.filter(s => s.branch === branchVal);
+            if(sectionVal !== 'ALL') list = list.filter(s => s.section === sectionVal);
+            if(gradeVal !== 'ALL') list = list.filter(s => s.grade === gradeVal);
+
+            let totalAllStudents = 0, totSun = 0, totMon = 0, totTue = 0, totWed = 0, totThu = 0, totAbs = 0;
+
+            let ranked = list.map(s => {
+                if(!s.classes || s.classes.length === 0) {
+                    s.classes = [{name: 'أول/1', students: 25}];
+                }
+                if(!s.absent) s.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
+
+                let totalStudents = s.classes.reduce((acc, c) => acc + (parseInt(c.students) || 0), 0);
+                let absSun = s.absent.sun;
+                let absMon = s.absent.mon;
+                let absTue = s.absent.tue;
+                let absWed = s.absent.wed;
+                let absThu = s.absent.thu;
+                let totalAbsent = absSun + absMon + absTue + absWed + absThu;
+                let activeDaysCount = 5;
+                let possible = totalStudents * activeDaysCount;
+                let rate = possible > 0 ? (((possible - totalAbsent) / possible) * 100).toFixed(2) : '100.00';
+                return { ...s, totalStudents, absSun, absMon, absTue, absWed, absThu, totalAbsent, rate: parseFloat(rate) };
+            });
+
+            ranked.sort((a, b) => b.rate - a.rate);
+
+            ranked.forEach((item, index) => {
+                totalAllStudents += item.totalStudents;
+                totSun += item.absSun; totMon += item.absMon; totTue += item.absTue; totWed += item.absWed; totThu += item.absThu; totAbs += item.totalAbsent;
+
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${index + 1}</strong></td>
+                    <td style="text-align: right; padding-right: 10px; cursor: pointer; color: #0D6EFD;" onclick="viewSchoolDetail('${item.id}')">${item.name}</td>
+                    <td>${item.branch}</td>
+                    <td><strong>${item.totalStudents}</strong></td>
+                    <td>${item.absSun}</td>
+                    <td>${item.absMon}</td>
+                    <td>${item.absTue}</td>
+                    <td>${item.absWed}</td>
+                    <td>${item.absThu}</td>
+                    <td style="color: var(--pink-accent); font-weight: bold;">${item.totalAbsent}</td>
+                    <td><span style="color: var(--btn-green); font-weight: bold;">${item.rate}%</span></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            let dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+            let dayTotals = { sun: totSun, mon: totMon, tue: totTue, wed: totWed, thu: totThu };
+            dayKeys.forEach(k => {
+                let abs = dayTotals[k];
+                let pres = totalAllStudents - abs;
+                let rate = totalAllStudents > 0 ? ((pres / totalAllStudents) * 100).toFixed(2) : '100.00';
+                let dsElem = document.getElementById(`dstat_students_${k}`);
+                let dpElem = document.getElementById(`dstat_present_${k}`);
+                let daElem = document.getElementById(`dstat_absent_${k}`);
+                let drElem = document.getElementById(`dstat_rate_${k}`);
+
+                if(dsElem) dsElem.innerText = totalAllStudents;
+                if(dpElem) dpElem.innerText = pres;
+                if(daElem) daElem.innerText = abs;
+                if(drElem) drElem.innerText = `${rate}%`;
+            });
+            let dswElem = document.getElementById('dstat_students_week');
+            let dsrWeek = document.getElementById('dstat_rate_week');
+            if(dswElem) dswElem.innerText = totalAllStudents;
+            let grandPoss = totalAllStudents * 5;
+            let grandRate = grandPoss > 0 ? (((grandPoss - totAbs) / grandPoss) * 100).toFixed(2) : '100.00';
+            if(dsrWeek) dsrWeek.innerText = `${grandRate}%`;
+        }
+
+        function viewSchoolDetail(schoolId) {
+            renderSchoolTable(schoolId);
+        }
+
+        function backToDashboard() {
+            currentActiveSchoolId = null;
+            let dashView = document.getElementById('dashboardView');
+            let schoolView = document.getElementById('schoolTableView');
+            if(schoolView) schoolView.style.display = 'none';
+            if(dashView) dashView.style.display = 'block';
+            
+            let branchSel = document.getElementById('sb-branch');
+            let sectionSel = document.getElementById('sb-section');
+            let gradeSel = document.getElementById('sb-grade');
+            if(branchSel && !branchSel.disabled) branchSel.value = 'ALL';
+            if(sectionSel && !sectionSel.disabled) sectionSel.value = 'ALL';
+            if(gradeSel) gradeSel.value = 'ALL';
+
+            renderDashboard();
+        }
+
+        function exportEmptyTemplateExcel() {
+            let data = [{ "اسم الفصل": "أول/1", "عدد الطلاب": 25 }, { "اسم الفصل": "ثاني/1", "عدد الطلاب": 25 }];
+            let ws = XLSX.utils.json_to_sheet(data);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "قالب الفصول");
+            XLSX.writeFile(wb, "قالب_فصول_ارتباط_فارغ.xlsx");
+        }
+
+        function importSchoolClassesFromExcel(e) {
+            let file = e.target.files[0];
+            if(!file) return;
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    let data = new Uint8Array(event.target.result);
+                    let workbook = XLSX.read(data, {type: 'array'});
+                    let rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    let targetId = currentUser.role === 'SCHOOL' ? currentUser.schoolId : currentActiveSchoolId;
+                    let school = schoolsData.find(s => s.id === targetId);
+                    if(!school) { alert('⚠️ يرجى تحديد المدرسة أولاً.'); return; }
+                    let newClasses = [];
+                    rows.forEach(r => {
+                        let cName = r["اسم الفصل"] || r["الفصل"] || r[Object.keys(r)[0]];
+                        let cStud = r["عدد الطلاب"] || r["الطلاب"] || r[Object.keys(r)[1]];
+                        if(cName) newClasses.push({ name: String(cName).trim(), students: parseInt(cStud) || 25 });
+                    });
+                    if(newClasses.length > 0) {
+                        if(!school.classes) school.classes = [];
+                        school.classes = newClasses;
+                        saveDataToStorage(); // حفظ تلقائي
+                        renderSchoolTable(school.id);
+                        alert(`✅ تم استيراد ${newClasses.length} فصول بنجاح.`);
+                    }
+                } catch(err) { alert('⚠️ خطأ في قراءة ملف الإكسل.'); }
+                e.target.value = '';
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function exportToExcel() {
+            let wb = XLSX.utils.book_new();
+            let weekSel = document.getElementById('weekSelect');
+            let weekText = (weekSel && weekSel.selectedOptions[0]) ? weekSel.selectedOptions[0].text : 'التقرير';
+            let dashView = document.getElementById('dashboardView');
+            if(dashView && dashView.style.display !== 'none') {
+                let tbody = document.getElementById('dashboardTbody');
+                if(tbody && tbody.parentElement) {
+                    let ws = XLSX.utils.table_to_sheet(tbody.parentElement);
+                    XLSX.utils.book_append_sheet(wb, ws, "ترتيب الأقسام");
+                    XLSX.writeFile(wb, `ترتيب_الأقسام_${weekText}.xlsx`);
+                }
+            } else {
+                let stTable = document.getElementById('schoolTable');
+                if(stTable) {
+                    let ws = XLSX.utils.table_to_sheet(stTable);
+                    XLSX.utils.book_append_sheet(wb, ws, "غياب المدرسة");
+                    XLSX.writeFile(wb, `بيانات_غياب_المدرسة_${weekText}.xlsx`);
+                }
+            }
+        }
+
+        function populateSchoolOptions() {
+            const select = document.getElementById('newSchoolId');
+            if(!select) return;
+            select.innerHTML = '';
+            schoolsData.forEach(s => {
+                let opt = document.createElement('option');
+                opt.value = s.id; opt.innerText = s.name;
+                select.appendChild(opt);
+            });
+        }
+
+        function handleRoleChange() {
+            let roleSelect = document.getElementById('newRole');
+            if(!roleSelect) return;
+            let role = roleSelect.value;
+            let select = document.getElementById('newSchoolId');
+            if(!select) return;
+            select.innerHTML = '';
+            if(role === 'SUPER_ADMIN') {
+                let opt = document.createElement('option'); opt.value = 'ALL'; opt.innerText = 'المشرف العام';
+                select.appendChild(opt);
+            } else if(role === 'MANAGER') {
+                ['الحزم', 'طويق'].forEach(b => {
+                    let opt = document.createElement('option'); opt.value = b; opt.innerText = `مدير مجمع ${b}`;
+                    select.appendChild(opt);
+                });
+            } else if(role === 'SUPERVISOR') {
+                ['بنين', 'بنات'].forEach(sec => {
+                    let opt = document.createElement('option'); opt.value = sec; opt.innerText = `مشرف قطاع ${sec}`;
+                    select.appendChild(opt);
+                });
+            } else {
+                schoolsData.forEach(s => {
+                    let opt = document.createElement('option'); opt.value = s.id; opt.innerText = s.name;
+                    select.appendChild(opt);
+                });
+            }
+        }
+
+        function addNewUser(e) {
+            e.preventDefault();
+            let uInput = document.getElementById('newUsername');
+            let pInput = document.getElementById('newPassword');
+            let rSelect = document.getElementById('newRole');
+            let sSelect = document.getElementById('newSchoolId');
+            if(!uInput || !pInput || !rSelect || !sSelect) return;
+            let u = uInput.value.trim();
+            let p = pInput.value.trim();
+            let role = rSelect.value;
+            let sId = sSelect.value;
+            users.push({ username: u, pass: p, role: role, schoolId: sId, name: u, allowPastEdit: false });
+            saveDataToStorage(); // حفظ تلقائي
+            alert('✅ تمت إضافة المستخدم بنجاح.');
+            renderUsersList();
+            renderPermsList();
+        }
+
+        function renderUsersList() {
+            const tbody = document.getElementById('usersTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            users.forEach((u, index) => {
+                let schName = 'عام';
+                if(u.schoolId) {
+                    let foundSch = schoolsData.find(s => s.id === u.schoolId);
+                    if(foundSch) schName = foundSch.name;
+                }
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${u.username}</td>
+                    <td>${getRoleTitle(u.role)}</td>
+                    <td>${u.branch || u.section || schName}</td>
+                    <td><code>${u.pass}</code></td>
+                    <td>${u.username !== 'admin' ? `<button class="btn-danger" onclick="users.splice(${index},1); saveDataToStorage(); renderUsersList(); renderPermsList();">حذف</button>` : ''}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderPermsList() {
+            const tbody = document.getElementById('permsTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            users.forEach((u, index) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${u.name}</strong> (${u.username})</td>
+                    <td>${getRoleTitle(u.role)}</td>
+                    <td>
+                        <input type="checkbox" ${u.allowPastEdit ? 'checked' : ''} onchange="togglePastEdit(${index}, this.checked)" style="width:18px; height:18px; cursor:pointer;">
+                        <span style="margin-right:5px; font-weight:bold; color:${u.allowPastEdit?'green':'#666'}">${u.allowPastEdit ? 'مسموح بالتعديل في الأسابيع السابقة' : 'مقفل (قراءة فقط)'}</span>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function togglePastEdit(index, val) {
+            users[index].allowPastEdit = val;
+            saveDataToStorage(); // حفظ تلقائي
+            renderPermsList();
+        }
+    </script>
+</body>
+</html>
