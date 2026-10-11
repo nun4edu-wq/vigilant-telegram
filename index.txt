@@ -127,6 +127,12 @@
         }
         .btn-save-data:hover { background-color: #e0a800; }
 
+        .btn-refresh-data {
+            background-color: var(--btn-blue); color: white; border: none; padding: 6px 14px;
+            border-radius: 4px; font-weight: 800; font-size: 0.82rem; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .btn-refresh-data:hover { background-color: #0b5ed7; }
+
         .btn-current-week {
             background-color: var(--btn-blue); color: white; border: none; padding: 4px 10px;
             border-radius: 4px; font-weight: 700; font-size: 0.78rem; cursor: pointer;
@@ -149,7 +155,6 @@
         .day-title-blue { color: #6EA8FE; font-weight: bold; font-size: 0.85rem; display: block; }
         .day-date { font-size: 0.68rem; font-weight: normal; color: #E2E8F0; margin-top: 2px; display: block; }
         
-        /* تصميم أزرار حالات الأيام (حضوري، عن بعد، إجازة) */
         .day-toggle { background: var(--btn-green); border: 1px solid #146c43; padding: 2px 4px; border-radius: 3px; font-size: 0.65rem; cursor: pointer; margin-top: 3px; display: block; width: 100%; color: white; font-weight: bold; }
         .day-toggle.remote { background: var(--btn-blue); border-color: #0b5ed7; color: white; }
         .day-toggle.holiday { background: var(--pink-accent); color: white; border-color: #b02a37; }
@@ -273,6 +278,7 @@
                 <div class="view-title">
                     <span id="main-view-heading">لوحة ترتيب الأقسام والمتابعة</span>
                     <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn-refresh-data" onclick="refreshDataNow()">🔄 تحديث البيانات</button>
                         <button id="btn-save-global" class="btn-save-data" onclick="manualSaveData()">💾 حفظ البيانات</button>
                         <button class="btn-action-excel" onclick="exportToExcel()">📊 تصدير إلى Excel</button>
                     </div>
@@ -635,7 +641,7 @@
         function sortClassesProperly(classesArray) {
             const rankOrder = {
                 'أول': 1, 'اول': 1, 'الاول': 1,
-                'ثاني': 2, 'الثاني': 2,
+                'ثاني': 2, 'الثاني': 2, 'ثان': 2, 'الثان': 2,
                 'ثالث': 3, 'الثالث': 3,
                 'رابع': 4, 'الرابع': 4,
                 'خامس': 5, 'الخامس': 5,
@@ -673,6 +679,29 @@
             alert('💾 تم حفظ جميع البيانات بنجاح في المتصفح!');
         }
 
+        function refreshDataNow() {
+            let localSaved = localStorage.getItem('sharjah_schools_data');
+            if (localSaved) {
+                try {
+                    schoolsData = JSON.parse(localSaved);
+                } catch(e) {}
+            }
+            let localUsers = localStorage.getItem('sharjah_users_data');
+            if (localUsers) {
+                try {
+                    users = JSON.parse(localUsers);
+                } catch(e) {}
+            }
+            if (currentActiveSchoolId) {
+                renderSchoolTable(currentActiveSchoolId);
+            } else {
+                renderDashboard();
+            }
+            renderUsersList();
+            renderPermsList();
+            alert('🔄 تم تحديث البيانات ومزامنتها بنجاح!');
+        }
+
         document.addEventListener("DOMContentLoaded", () => {
             onTermChange();
             populateSchoolOptions();
@@ -686,6 +715,11 @@
             if(!weekSelect) return;
             weekSelect.innerHTML = '';
             
+            let allOpt = document.createElement('option');
+            allOpt.value = 'ALL_WEEKS';
+            allOpt.innerText = '📅 جميع الأسابيع (تراكمي)';
+            weekSelect.appendChild(allOpt);
+
             let weeksList = [];
             if(termVal === 'ALL') {
                 weeksList = [...schoolWeeksData.term1, ...schoolWeeksData.term2];
@@ -708,16 +742,11 @@
                 let opt = document.createElement('option');
                 opt.value = wCode;
                 opt.innerText = w.label;
-                if(wCode === currentActiveWeekCode) opt.selected = true;
                 weekSelect.appendChild(opt);
             });
 
-            if(weekSelect.options.length === 0 && weeksList.length > 0) {
-                let opt = document.createElement('option');
-                opt.value = currentActiveWeekCode;
-                opt.innerText = 'الأسبوع الحالي';
-                weekSelect.appendChild(opt);
-            }
+            weekSelect.value = currentActiveWeekCode;
+            if(!weekSelect.value) weekSelect.selectedIndex = 0;
             onWeekChange();
         }
 
@@ -736,6 +765,18 @@
             const weekSelect = document.getElementById('weekSelect');
             if(!weekSelect || !weekSelect.value) return;
             let weekVal = weekSelect.value;
+            
+            let sSun = document.getElementById('date_sun');
+            let sThu = document.getElementById('date_thu');
+
+            if(weekVal === 'ALL_WEEKS') {
+                if(sSun) sSun.value = '2026-08-23';
+                if(sThu) sThu.value = '2027-06-24';
+                currentPage = 1;
+                updateDatesHeader();
+                return;
+            }
+
             let parts = weekVal.split('_');
             let termNum = parts[0].replace('t', '');
             let weekNum = parseInt(parts[1].replace('w', ''));
@@ -743,8 +784,6 @@
             let weeksList = termNum === '1' ? schoolWeeksData.term1 : schoolWeeksData.term2;
             let wkObj = weeksList.find(w => w.week === weekNum);
             if(wkObj) {
-                let sSun = document.getElementById('date_sun');
-                let sThu = document.getElementById('date_thu');
                 if(sSun) sSun.value = wkObj.start;
                 if(sThu) sThu.value = wkObj.end;
                 currentPage = 1;
@@ -900,11 +939,17 @@
                 allowEdit = false;
                 if(banner) {
                     banner.style.display = 'block';
-                    banner.innerText = '👁️ صلاحية مدير مجمع: استعراض بيانات مدارس مجمعك فقط (للقراءة فقط - حقول ميتة).';
+                    banner.innerText = '👁️ صلاحية مدير مجمع: استعراض بيانات مدارس مجمعك فقط (للقراءة فقط).';
                 }
             } else if (currentUser && currentUser.role === 'SUPER_ADMIN') {
                 allowEdit = true;
                 if(banner) banner.style.display = 'none';
+            } else if (selectedWeek === 'ALL_WEEKS') {
+                allowEdit = false;
+                if(banner) {
+                    banner.style.display = 'block';
+                    banner.innerText = '📊 عرض تراكمي لجميع الأسابيع (وضع القراءة فقط).';
+                }
             } else if (selectedWeek !== currentActiveWeekCode) {
                 if (currentUser && currentUser.allowPastEdit) {
                     allowEdit = true;
@@ -977,7 +1022,7 @@
                 let school = schoolsData.find(s => s.id === currentUser.schoolId);
                 if(school) {
                     if(branchSel) { branchSel.value = school.branch; branchSel.disabled = true; }
-                    if(sectionSel) { sectionSel.value = school.section; branchSel.disabled = true; onSectionFilterChange(); }
+                    if(sectionSel) { sectionSel.value = school.section; sectionSel.disabled = true; onSectionFilterChange(); }
                     if(gradeSel) { gradeSel.value = school.grade; gradeSel.disabled = true; }
                 }
             } else if(currentUser.role === 'MANAGER' && currentUser.branch) {
@@ -1048,6 +1093,9 @@
             if(targetView) targetView.style.display = 'block';
             document.querySelectorAll('.sidebar-menu a').forEach(a => a.classList.remove('active'));
             if(elem) elem.classList.add('active');
+
+            if(viewId === 'view-users') renderUsersList();
+            if(viewId === 'view-perms') renderPermsList();
         }
 
         function renderSchoolTable(schoolId) {
@@ -1058,6 +1106,19 @@
             if(schoolView) schoolView.style.display = 'block';
 
             const school = schoolsData.find(s => s.id === schoolId);
+            
+            if(school && currentUser && currentUser.role !== 'SCHOOL') {
+                let branchSel = document.getElementById('sb-branch');
+                let sectionSel = document.getElementById('sb-section');
+                let gradeSel = document.getElementById('sb-grade');
+                if(branchSel) branchSel.value = school.branch;
+                if(sectionSel) {
+                    sectionSel.value = school.section;
+                    onSectionFilterChange();
+                }
+                if(gradeSel) gradeSel.value = school.grade;
+            }
+
             let heading = document.getElementById('main-view-heading');
             if(heading && school) heading.innerText = `متابعة الغياب والانضباط - ${school.name}`;
             const tbody = document.getElementById('schoolTbody');
@@ -1092,13 +1153,16 @@
                 dayKeys.forEach(dk => {
                     let isHolidayOrRemote = school.dayStatuses[dk] === 'holiday';
                     let isDisabledInput = isHolidayOrRemote || !canEdit;
-                    tdsHtml += `<td><input type="number" class="input-absent ${isDisabledInput?'input-disabled':''}" ${isDisabledInput?'disabled':''} value="${idx === 0 ? school.absent[dk] : ''}" onfocus="handleAbsentFocus(this)" onblur="handleAbsentBlur(this)" oninput="updateSchoolAbsent('${schoolId}', '${dk}', this)"></td>`;
+                    let absVal = (school.classAbsent && school.classAbsent[idx] && school.classAbsent[idx][dk] !== undefined) ? school.classAbsent[idx][dk] : (idx === 0 ? (school.absent[dk] || 0) : 0);
+                    
+                    tdsHtml += `<td><input type="number" class="input-absent ${isDisabledInput?'input-disabled':''}" ${isDisabledInput?'disabled':''} value="${absVal}" min="0" max="${cls.students}" onfocus="handleAbsentFocus(this)" onblur="handleAbsentBlur(this)" oninput="updateClassAbsent('${schoolId}', ${idx}, '${dk}', this)"></td>`;
                 });
 
                 tr.innerHTML = `
                     <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!isSuperAdmin?'readonly':''} oninput="updateClassName(this, '${schoolId}',${idx})"></td>
                     <td><input type="number" class="input-absent" value="${cls.students}" ${!isSuperAdmin?'readonly':''} oninput="updateClassStudents(this, '${schoolId}',${idx})"></td>
-                    ${tdsHtml}${isSuperAdmin ? `<td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>` : ''}
+                    ${tdsHtml}
+                    ${isSuperAdmin ? `<td><button class="btn-danger" onclick="deleteClassRow('${schoolId}',${idx})">حذف</button></td>` : ''}
                 `;
                 tbody.appendChild(tr);
             });
@@ -1129,7 +1193,6 @@
             if(!school.dayStatuses) school.dayStatuses = {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'};
 
             let current = school.dayStatuses[day] || 'onsite';
-            // الدورة التدجيرية: حضوري -> عن بعد -> إجازة -> حضوري
             if(current === 'onsite') school.dayStatuses[day] = 'remote';
             else if(current === 'remote') school.dayStatuses[day] = 'holiday';
             else school.dayStatuses[day] = 'onsite';
@@ -1152,13 +1215,32 @@
             }
         }
 
-        function updateSchoolAbsent(schoolId, day, input) {
+        function updateClassAbsent(schoolId, classIdx, day, input) {
             let canEdit = checkWeekPermissions();
             if(!canEdit) return; 
             let school = schoolsData.find(s => s.id === schoolId);
             if(school) {
-                if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
-                school.absent[day] = parseInt(input.value) || 0;
+                if(!school.classAbsent) school.classAbsent = {};
+                if(!school.classAbsent[classIdx]) school.classAbsent[classIdx] = {sun:0, mon:0, tue:0, wed:0, thu:0};
+                
+                let maxStudents = school.classes[classIdx].students;
+                let val = parseInt(input.value) || 0;
+                
+                if(val > maxStudents) {
+                    alert(`⚠️ عدد الغياب (${val}) لا يمكن أن يتجاوز عدد طلاب الفصل (${maxStudents})!`);
+                    val = maxStudents;
+                    input.value = maxStudents;
+                }
+
+                school.classAbsent[classIdx][day] = val;
+                
+                let totalDayAbsent = 0;
+                school.classes.forEach((c, cIdx) => {
+                    let rowAbs = (school.classAbsent[cIdx] && school.classAbsent[cIdx][day] !== undefined) ? school.classAbsent[cIdx][day] : (cIdx === 0 ? (school.absent[day] || 0) : 0);
+                    totalDayAbsent += rowAbs;
+                });
+                school.absent[day] = totalDayAbsent;
+
                 saveDataToStorage();
                 calculateStats();
             }
@@ -1248,7 +1330,6 @@
                     if(rElem) rElem.innerText = 'إجازة (مستبعد)';
                 } else if(status === 'remote') {
                     activeDays++;
-                    // في نظام عن بعد، يعتبر الجميع حاضرين (أو حسب رغبتكم، الغياب 0 أو مستبعد)
                     let pres = totalStudents;
                     let rate = '100.00 (عن بعد)';
                     if(sElem) sElem.innerText = totalStudents;
@@ -1336,13 +1417,11 @@
                 
                 let dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
                 let totalAbsent = 0;
-                let activeDaysCount = 0;
                 let possible = 0;
 
                 dayKeys.forEach(dk => {
                     let st = s.dayStatuses[dk] || 'onsite';
                     if(st !== 'holiday') {
-                        activeDaysCount++;
                         possible += totalStudents;
                         if(st === 'onsite') {
                             totalAbsent += (s.absent[dk] || 0);
@@ -1519,6 +1598,62 @@
             }
         }
 
+        function renderUsersList() {
+            const tbody = document.getElementById('usersTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            users.forEach((usr, idx) => {
+                let tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${usr.username}</strong></td>
+                    <td>${getRoleTitle(usr.role)}</td>
+                    <td>${usr.schoolId || usr.branch || usr.section || 'النطاق الشامل'}</td>
+                    <td><code>${usr.pass}</code></td>
+                    <td>${idx > 0 ? `<button class="btn-danger" onclick="deleteUser(${idx})">حذف</button>` : '<span style="color:gray;">محمي</span>'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function deleteUser(index) {
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') return;
+            if(confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+                users.splice(index, 1);
+                saveDataToStorage();
+                renderUsersList();
+                renderPermsList();
+            }
+        }
+
+        function renderPermsList() {
+            const tbody = document.getElementById('permsTbody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            users.forEach((usr, idx) => {
+                let tr = document.createElement('tr');
+                let checked = usr.allowPastEdit ? 'checked' : '';
+                tr.innerHTML = `
+                    <td><strong>${usr.name}</strong> (${usr.username})</td>
+                    <td>${getRoleTitle(usr.role)}</td>
+                    <td>
+                        <input type="checkbox" ${checked} onchange="togglePastEditPerm(${idx}, this)" style="width:18px; height:18px; cursor:pointer;">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function togglePastEditPerm(index, checkbox) {
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') {
+                checkbox.checked = !checkbox.checked;
+                alert('⚠️ عذراً، تعديل الصلاحيات متاح للمشرف العام فقط.');
+                return;
+            }
+            users[index].allowPastEdit = checkbox.checked;
+            saveDataToStorage();
+            alert('✅ تم تحديث صلاحية التعديل بنجاح.');
+        }
+
         function addNewUser(e) {
             e.preventDefault();
             let uInput = document.getElementById('newUsername');
@@ -1532,56 +1667,13 @@
             let sId = sSelect.value;
             users.push({ username: u, pass: p, role: role, schoolId: sId, name: u, allowPastEdit: false });
             saveDataToStorage();
+            uInput.value = '';
+            pInput.value = '';
             alert('✅ تمت إضافة المستخدم بنجاح.');
             renderUsersList();
             renderPermsList();
         }
 
-        function renderUsersList() {
-            const tbody = document.getElementById('usersTbody');
-            if(!tbody) return;
-            tbody.innerHTML = ``;
-            users.forEach((u, index) => {
-                let schName = 'عام';
-                if(u.schoolId) {
-                    let foundSch = schoolsData.find(s => s.id === u.schoolId);
-                    if(foundSch) schName = foundSch.name;
-                }
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${u.username}</td>
-                    <td>${getRoleTitle(u.role)}</td>
-                    <td>${u.branch || u.section || schName}</td>
-                    <td><code>${u.pass}</code></td>
-                    <td>${u.username !== 'admin' ? `<button class="btn-danger" onclick="users.splice(${index},1); saveDataToStorage(); renderUsersList(); renderPermsList();">حذف</button>` : ''}</td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderPermsList() {
-            const tbody = document.getElementById('permsTbody');
-            if(!tbody) return;
-            tbody.innerHTML = ``;
-            users.forEach((u, index) => {
-                let tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>${u.name}</strong> (${u.username})</td>
-                    <td>${getRoleTitle(u.role)}</td>
-                    <td>
-                        <input type="checkbox" ${u.allowPastEdit ? 'checked' : ''} onchange="togglePastEdit(${index}, this.checked)" style="width:18px; height:18px; cursor:pointer;">
-                        <span style="margin-right:5px; font-weight:bold; color:${u.allowPastEdit?'green':'#666'}">${u.allowPastEdit ? 'مسموح بالتعديل في الأسابيع السابقة' : 'مقفل (قراءة فقط)'}</span>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function togglePastEdit(index, val) {
-            users[index].allowPastEdit = val;
-            saveDataToStorage();
-            renderPermsList();
-        }
     </script>
 </body>
 </html>
