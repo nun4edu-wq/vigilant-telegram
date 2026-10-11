@@ -148,8 +148,11 @@
 
         .day-title-blue { color: #6EA8FE; font-weight: bold; font-size: 0.85rem; display: block; }
         .day-date { font-size: 0.68rem; font-weight: normal; color: #E2E8F0; margin-top: 2px; display: block; }
-        .day-toggle { background: #EEE; border: 1px solid #CCC; padding: 1px 4px; border-radius: 3px; font-size: 0.65rem; cursor: pointer; margin-top: 2px; display: block; width: 100%; color: #333; }
-        .day-toggle.holiday { background: var(--pink-accent); color: white; border-color: var(--pink-accent); }
+        
+        /* تصميم أزرار حالات الأيام (حضوري، عن بعد، إجازة) */
+        .day-toggle { background: var(--btn-green); border: 1px solid #146c43; padding: 2px 4px; border-radius: 3px; font-size: 0.65rem; cursor: pointer; margin-top: 3px; display: block; width: 100%; color: white; font-weight: bold; }
+        .day-toggle.remote { background: var(--btn-blue); border-color: #0b5ed7; color: white; }
+        .day-toggle.holiday { background: var(--pink-accent); color: white; border-color: #b02a37; }
 
         .btn-add { background: var(--btn-green); color: white; border: none; padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.78rem; }
         .btn-danger { background: var(--pink-accent); color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.73rem; }
@@ -391,7 +394,7 @@
                     <div id="school-action-box" style="background:#F8FAFC; padding:10px; border-radius:4px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border:1px dashed var(--purple-dark);">
                         <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                             <span style="font-weight:bold; color:var(--purple-dark); font-size:0.8rem;">➕ إضافة فصل:</span>
-                            <input type="text" id="newClassNameInput" placeholder="اسم الفصل (مثال: ثالث/2)" style="padding:4px; font-size:0.8rem; width:130px; border:1px solid #CCC; border-radius:4px;">
+                            <input type="text" id="newClassNameInput" placeholder="اسم الفصل (مثال: أول/3)" style="padding:4px; font-size:0.8rem; width:130px; border:1px solid #CCC; border-radius:4px;">
                             <input type="number" id="newClassStudentsInput" placeholder="الطلاب" value="25" min="1" style="padding:4px; font-size:0.8rem; width:70px; border:1px solid #CCC; border-radius:4px;">
                             <button class="btn-add" onclick="addNewClassToSchool()">إضافة فصل</button>
                         </div>
@@ -408,11 +411,11 @@
                             <tr>
                                 <th>اسم الفصل</th>
                                 <th>عدد الطلاب</th>
-                                <th><span class="day-title-blue" id="th_title_sun">الأحد</span><span class="day-date" id="hdr_date_sun">--</span><button class="day-toggle" id="btnSun" onclick="toggleHoliday('sun')">دراسة</button></th>
-                                <th><span class="day-title-blue" id="th_title_mon">الاثنين</span><span class="day-date" id="hdr_date_mon">--</span><button class="day-toggle" id="btnMon" onclick="toggleHoliday('mon')">دراسة</button></th>
-                                <th><span class="day-title-blue" id="th_title_tue">الثلاثاء</span><span class="day-date" id="hdr_date_tue">--</span><button class="day-toggle" id="btnTue" onclick="toggleHoliday('tue')">دراسة</button></th>
-                                <th><span class="day-title-blue" id="th_title_wed">الأربعاء</span><span class="day-date" id="hdr_date_wed">--</span><button class="day-toggle" id="btnWed" onclick="toggleHoliday('wed')">دراسة</button></th>
-                                <th><span class="day-title-blue" id="th_title_thu">الخميس</span><span class="day-date" id="hdr_date_thu">--</span><button class="day-toggle" id="btnThu" onclick="toggleHoliday('thu')">دراسة</button></th>
+                                <th><span class="day-title-blue" id="th_title_sun">الأحد</span><span class="day-date" id="hdr_date_sun">--</span><button class="day-toggle" id="btnSun" onclick="toggleDayStatus('sun')">حضوري</button></th>
+                                <th><span class="day-title-blue" id="th_title_mon">الاثنين</span><span class="day-date" id="hdr_date_mon">--</span><button class="day-toggle" id="btnMon" onclick="toggleDayStatus('mon')">حضوري</button></th>
+                                <th><span class="day-title-blue" id="th_title_tue">الثلاثاء</span><span class="day-date" id="hdr_date_tue">--</span><button class="day-toggle" id="btnTue" onclick="toggleDayStatus('tue')">حضوري</button></th>
+                                <th><span class="day-title-blue" id="th_title_wed">الأربعاء</span><span class="day-date" id="hdr_date_wed">--</span><button class="day-toggle" id="btnWed" onclick="toggleDayStatus('wed')">حضوري</button></th>
+                                <th><span class="day-title-blue" id="th_title_thu">الخميس</span><span class="day-date" id="hdr_date_thu">--</span><button class="day-toggle" id="btnThu" onclick="toggleDayStatus('thu')">حضوري</button></th>
                                 <th id="th-action-col">الإجراء</th>
                             </tr>
                         </thead>
@@ -530,8 +533,8 @@
                 { week: 4, label: 'الأسبوع 4', start: '2026-09-13', end: '2026-09-17' },
                 { week: 5, label: 'الأسبوع 5', start: '2026-09-20', end: '2026-09-24' },
                 { week: 6, label: 'الأسبوع 6', start: '2026-09-27', end: '2026-10-01' },
-                { week: 7, label: 'الأسبوع 7 (الأسبوع الحالي)', start: '2026-10-04', end: '2026-10-08' },
-                { week: 8, label: 'الأسبوع 8', start: '2026-10-11', end: '2026-10-15' },
+                { week: 7, label: 'الأسبوع 7', start: '2026-10-04', end: '2026-10-08' },
+                { week: 8, label: 'الأسبوع 8 (الأسبوع الحالي)', start: '2026-10-11', end: '2026-10-15' },
                 { week: 9, label: 'الأسبوع 9', start: '2026-10-18', end: '2026-10-22' },
                 { week: 10, label: 'الأسبوع 10', start: '2026-10-25', end: '2026-10-29' },
                 { week: 11, label: 'الأسبوع 11', start: '2026-11-01', end: '2026-11-05' },
@@ -567,23 +570,39 @@
             ]
         };
 
-        const currentActiveWeekCode = 't1_w7_6';
+        function getDynamicCurrentWeekCode() {
+            let todayStr = new Date().toISOString().split('T')[0];
+            let foundWeekCode = 't1_w8_7';
+
+            let allWeeks = [...schoolWeeksData.term1.map((w, i) => ({ ...w, term: 1, index: i })), 
+                            ...schoolWeeksData.term2.map((w, i) => ({ ...w, term: 2, index: i }))];
+
+            for (let w of allWeeks) {
+                if (todayStr >= w.start && todayStr <= w.end) {
+                    foundWeekCode = `t${w.term}_w${w.week}_${w.index}`;
+                    break;
+                }
+            }
+            return foundWeekCode;
+        }
+
+        const currentActiveWeekCode = getDynamicCurrentWeekCode();
 
         let schoolsData = JSON.parse(localStorage.getItem('sharjah_schools_data')) || [
-            { id: 'h_b_p', branch: 'الحزم', section: 'بنين', grade: 'ابتدائي', name: 'الحزم - بنين - ابتدائي', classes: [{name:'أول/1', students: 25}, {name:'ثاني/1', students: 28}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_b_m', branch: 'الحزم', section: 'بنين', grade: 'متوسط', name: 'الحزم - بنين - متوسط', classes: [{name:'أول متوسط/1', students: 30}], absent: {sun:1, mon:0, tue:0, wed:1, thu:0} },
-            { id: 'h_b_s', branch: 'الحزم', section: 'بنين', grade: 'ثانوي', name: 'الحزم - بنين - ثانوي', classes: [{name:'أول ثانوي/1', students: 32}], absent: {sun:0, mon:1, tue:0, wed:0, thu:1} },
-            { id: 'h_g_k', branch: 'الحزم', section: 'بنات', grade: 'رياض أطفال', name: 'الحزم - بنات - رياض أطفال', classes: [{name:'روضة أولى', students: 20}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_g_p', branch: 'الحزم', section: 'بنات', grade: 'ابتدائي', name: 'الحزم - بنات - ابتدائي', classes: [{name:'أول/1 بنات', students: 24}], absent: {sun:1, mon:0, tue:1, wed:0, thu:0} },
-            { id: 'h_g_m', branch: 'الحزم', section: 'بنات', grade: 'متوسط', name: 'الحزم - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات', students: 29}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 'h_g_s', branch: 'الحزم', section: 'بنات', grade: 'ثانوي', name: 'الحزم - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات', students: 31}], absent: {sun:0, mon:1, tue:0, wed:1, thu:0} },
-            { id: 't_b_p', branch: 'طويق', section: 'بنين', grade: 'ابتدائي', name: 'طويق - بنين - ابتدائي', classes: [{name:'أول/1 طويق', students: 26}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_b_m', branch: 'طويق', section: 'بنين', grade: 'متوسط', name: 'طويق - بنين - متوسط', classes: [{name:'أول متوسط/1 طويق', students: 28}], absent: {sun:1, mon:1, tue:0, wed:0, thu:0} },
-            { id: 't_b_s', branch: 'طويق', section: 'بنين', grade: 'ثانوي', name: 'طويق - بنين - ثانوي', classes: [{name:'أول ثانوي/1 طويق', students: 30}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_k', branch: 'طويق', section: 'بنات', grade: 'رياض أطفال', name: 'طويق - بنات - رياض أطفال', classes: [{name:'روضة/1 طويق', students: 18}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_p', branch: 'طويق', section: 'بنات', grade: 'ابتدائي', name: 'طويق - بنات - ابتدائي', classes: [{name:'أول/1 بنات طويق', students: 22}], absent: {sun:0, mon:0, tue:1, wed:0, thu:0} },
-            { id: 't_g_m', branch: 'طويق', section: 'بنات', grade: 'متوسط', name: 'طويق - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات طويق', students: 27}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0} },
-            { id: 't_g_s', branch: 'طويق', section: 'بنات', grade: 'ثانوي', name: 'طويق - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات طويق', students: 29}], absent: {sun:0, mon:0, tue:0, wed:1, thu:0} }
+            { id: 'h_b_p', branch: 'الحزم', section: 'بنين', grade: 'ابتدائي', name: 'الحزم - بنين - ابتدائي', classes: [{name:'أول/1', students: 25}, {name:'ثاني/1', students: 28}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_b_m', branch: 'الحزم', section: 'بنين', grade: 'متوسط', name: 'الحزم - بنين - متوسط', classes: [{name:'أول متوسط/1', students: 30}], absent: {sun:1, mon:0, tue:0, wed:1, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_b_s', branch: 'الحزم', section: 'بنين', grade: 'ثانوي', name: 'الحزم - بنين - ثانوي', classes: [{name:'أول ثانوي/1', students: 32}], absent: {sun:0, mon:1, tue:0, wed:0, thu:1}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_g_k', branch: 'الحزم', section: 'بنات', grade: 'رياض أطفال', name: 'الحزم - بنات - رياض أطفال', classes: [{name:'روضة أولى', students: 20}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_g_p', branch: 'الحزم', section: 'بنات', grade: 'ابتدائي', name: 'الحزم - بنات - ابتدائي', classes: [{name:'أول/1 بنات', students: 24}], absent: {sun:1, mon:0, tue:1, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_g_m', branch: 'الحزم', section: 'بنات', grade: 'متوسط', name: 'الحزم - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات', students: 29}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 'h_g_s', branch: 'الحزم', section: 'بنات', grade: 'ثانوي', name: 'الحزم - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات', students: 31}], absent: {sun:0, mon:1, tue:0, wed:1, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_b_p', branch: 'طويق', section: 'بنين', grade: 'ابتدائي', name: 'طويق - بنين - ابتدائي', classes: [{name:'أول/1 طويق', students: 26}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_b_m', branch: 'طويق', section: 'بنين', grade: 'متوسط', name: 'طويق - بنين - متوسط', classes: [{name:'أول متوسط/1 طويق', students: 28}], absent: {sun:1, mon:1, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_b_s', branch: 'طويق', section: 'بنين', grade: 'ثانوي', name: 'طويق - بنين - ثانوي', classes: [{name:'أول ثانوي/1 طويق', students: 30}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_g_k', branch: 'طويق', section: 'بنات', grade: 'رياض أطفال', name: 'طويق - بنات - رياض أطفال', classes: [{name:'روضة/1 طويق', students: 18}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_g_p', branch: 'طويق', section: 'بنات', grade: 'ابتدائي', name: 'طويق - بنات - ابتدائي', classes: [{name:'أول/1 بنات طويق', students: 22}], absent: {sun:0, mon:0, tue:1, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_g_m', branch: 'طويق', section: 'بنات', grade: 'متوسط', name: 'طويق - بنات - متوسط', classes: [{name:'أول متوسط/1 بنات طويق', students: 27}], absent: {sun:0, mon:0, tue:0, wed:0, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} },
+            { id: 't_g_s', branch: 'طويق', section: 'بنات', grade: 'ثانوي', name: 'طويق - بنات - ثانوي', classes: [{name:'أول ثانوي/1 بنات طويق', students: 29}], absent: {sun:0, mon:0, tue:0, wed:1, thu:0}, dayStatuses: {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'} }
         ];
 
         let users = JSON.parse(localStorage.getItem('sharjah_users_data')) || [
@@ -611,8 +630,38 @@
 
         let currentUser = null;
         let currentActiveSchoolId = null;
-        let holidays = { sun: false, mon: false, tue: false, wed: false, thu: false };
         let currentPage = 1;
+
+        function sortClassesProperly(classesArray) {
+            const rankOrder = {
+                'أول': 1, 'اول': 1, 'الاول': 1,
+                'ثاني': 2, 'الثاني': 2,
+                'ثالث': 3, 'الثالث': 3,
+                'رابع': 4, 'الرابع': 4,
+                'خامس': 5, 'الخامس': 5,
+                'سادس': 6, 'السادس': 6,
+                'سابع': 7, 'السابع': 7,
+                'ثامن': 8, 'الثامن': 8,
+                'تاسع': 9, 'التاسع': 9,
+                'عاشر': 10, 'العاشر': 10
+            };
+
+            classesArray.sort((a, b) => {
+                let nameA = a.name.trim();
+                let nameB = b.name.trim();
+
+                let firstWordA = nameA.split(/[\s\/\-\(\)]+/)[0];
+                let firstWordB = nameB.split(/[\s\/\-\(\)]+/)[0];
+
+                let rankA = rankOrder[firstWordA] || 999;
+                let rankB = rankOrder[firstWordB] || 999;
+
+                if (rankA !== rankB) {
+                    return rankA - rankB;
+                }
+                return nameA.localeCompare(nameB, 'ar', { numeric: true });
+            });
+        }
 
         function saveDataToStorage() {
             localStorage.setItem('sharjah_schools_data', JSON.stringify(schoolsData));
@@ -847,7 +896,6 @@
 
             let allowEdit = true;
 
-            // تحديد الصلاحيات بدقة تامة: الأسابيع السابقة مقفلة تماماً كحقول "ميتة" إلا لمن يمتلك صلاحية استثنائية
             if (currentUser && currentUser.role === 'MANAGER') {
                 allowEdit = false;
                 if(banner) {
@@ -874,12 +922,13 @@
             } else {
                 if(banner) banner.style.display = 'none';
                 if(currentUser && currentUser.role !== 'SCHOOL') {
-                    allowEdit = false; // مدير المجمع والمشرفون يستعرضون فقط
+                    allowEdit = false; 
                 }
             }
 
-            if(actionBox) actionBox.style.display = (allowEdit && currentUser.role === 'SCHOOL') ? 'flex' : 'none';
-            if(actionTh) actionTh.style.display = allowEdit ? 'table-cell' : 'none';
+            let isSuperAdmin = currentUser && currentUser.role === 'SUPER_ADMIN';
+            if(actionBox) actionBox.style.display = (allowEdit && isSuperAdmin) ? 'flex' : 'none';
+            if(actionTh) actionTh.style.display = (allowEdit && isSuperAdmin) ? 'table-cell' : 'none';
             if(saveGlobalBtn) saveGlobalBtn.style.display = allowEdit ? 'inline-block' : 'none';
 
             return allowEdit;
@@ -924,18 +973,17 @@
             if(gradeSel) { gradeSel.value = 'ALL'; gradeSel.disabled = false; }
             onSectionFilterChange();
 
-            // تطبيق القيود الأمنية المطلوبة بحيث يرى المستخدم فقط نطاقه ولا يظهر له غيره
             if(currentUser.role === 'SCHOOL' && currentUser.schoolId) {
                 let school = schoolsData.find(s => s.id === currentUser.schoolId);
                 if(school) {
                     if(branchSel) { branchSel.value = school.branch; branchSel.disabled = true; }
-                    if(sectionSel) { sectionSel.value = school.section; sectionSel.disabled = true; onSectionFilterChange(); }
+                    if(sectionSel) { sectionSel.value = school.section; branchSel.disabled = true; onSectionFilterChange(); }
                     if(gradeSel) { gradeSel.value = school.grade; gradeSel.disabled = true; }
                 }
             } else if(currentUser.role === 'MANAGER' && currentUser.branch) {
                 if(branchSel) { branchSel.value = currentUser.branch; branchSel.disabled = true; }
             } else if(currentUser.role === 'SUPERVISOR' && currentUser.section) {
-                if(sectionSel) { sectionSel.value = currentUser.section; sectionSel.disabled = true; onSectionFilterChange(); }
+                if(sectionSel) { sectionSel.value = currentUser.section; sectionSel.disabled = true; }
             }
             onTermChange();
         }
@@ -1029,18 +1077,28 @@
                 school.classes = [{name:'أول/1', students: 25}];
             }
             if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
+            if(!school.dayStatuses) school.dayStatuses = {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'};
+
+            sortClassesProperly(school.classes);
+            updateDayButtonsUI(school);
+
+            let isSuperAdmin = currentUser && currentUser.role === 'SUPER_ADMIN';
 
             school.classes.forEach((cls, idx) => {
                 let tr = document.createElement('tr');
+                let dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+                
+                let tdsHtml = '';
+                dayKeys.forEach(dk => {
+                    let isHolidayOrRemote = school.dayStatuses[dk] === 'holiday';
+                    let isDisabledInput = isHolidayOrRemote || !canEdit;
+                    tdsHtml += `<td><input type="number" class="input-absent ${isDisabledInput?'input-disabled':''}" ${isDisabledInput?'disabled':''} value="${idx === 0 ? school.absent[dk] : ''}" onfocus="handleAbsentFocus(this)" onblur="handleAbsentBlur(this)" oninput="updateSchoolAbsent('${schoolId}', '${dk}', this)"></td>`;
+                });
+
                 tr.innerHTML = `
-                    <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!canEdit?'readonly':''} oninput="updateClassName(this, '${schoolId}',${idx})"></td>
-                    <td><input type="number" class="input-absent" value="${cls.students}" ${!canEdit?'readonly':''} oninput="updateClassStudents(this, '${schoolId}',${idx})"></td>
-                    <td><input type="number" class="input-absent ${holidays.sun?'input-disabled':''}" ${holidays.sun || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.sun : ''}" oninput="updateSchoolAbsent('${schoolId}', 'sun', this)"></td>
-                    <td><input type="number" class="input-absent ${holidays.mon?'input-disabled':''}" ${holidays.mon || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.mon : ''}" oninput="updateSchoolAbsent('${schoolId}', 'mon', this)"></td>
-                    <td><input type="number" class="input-absent ${holidays.tue?'input-disabled':''}" ${holidays.tue || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.tue : ''}" oninput="updateSchoolAbsent('${schoolId}', 'tue', this)"></td>
-                    <td><input type="number" class="input-absent ${holidays.wed?'input-disabled':''}" ${holidays.wed || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.wed : ''}" oninput="updateSchoolAbsent('${schoolId}', 'wed', this)"></td>
-                    <td><input type="number" class="input-absent ${holidays.thu?'input-disabled':''}" ${holidays.thu || !canEdit?'disabled':''} value="${idx === 0 ? school.absent.thu : ''}" oninput="updateSchoolAbsent('${schoolId}', 'thu', this)"></td>
-                    ${canEdit ? `<td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>` : ''}
+                    <td><input type="text" class="input-absent" style="width:100px;" value="${cls.name}" ${!isSuperAdmin?'readonly':''} oninput="updateClassName(this, '${schoolId}',${idx})"></td>
+                    <td><input type="number" class="input-absent" value="${cls.students}" ${!isSuperAdmin?'readonly':''} oninput="updateClassStudents(this, '${schoolId}',${idx})"></td>
+                    ${tdsHtml}${isSuperAdmin ? `<td><button class="btn-danger" onclick="deleteClassRow('${schoolId}', ${idx})">حذف</button></td>` : ''}
                 `;
                 tbody.appendChild(tr);
             });
@@ -1048,9 +1106,55 @@
             calculateStats();
         }
 
+        function updateDayButtonsUI(school) {
+            const dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+            const labels = { 'onsite': 'حضوري', 'remote': 'عن بعد', 'holiday': 'إجازة' };
+            dayKeys.forEach(dk => {
+                let status = school.dayStatuses[dk] || 'onsite';
+                let btn = document.getElementById(`btn${dk.charAt(0).toUpperCase() + dk.slice(1)}`);
+                if(btn) {
+                    btn.className = 'day-toggle';
+                    if(status === 'remote') btn.classList.add('remote');
+                    if(status === 'holiday') btn.classList.add('holiday');
+                    btn.innerText = labels[status];
+                }
+            });
+        }
+
+        function toggleDayStatus(day) {
+            let canEdit = checkWeekPermissions();
+            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
+            let school = schoolsData.find(s => s.id === currentActiveSchoolId);
+            if(!school) return;
+            if(!school.dayStatuses) school.dayStatuses = {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'};
+
+            let current = school.dayStatuses[day] || 'onsite';
+            // الدورة التدجيرية: حضوري -> عن بعد -> إجازة -> حضوري
+            if(current === 'onsite') school.dayStatuses[day] = 'remote';
+            else if(current === 'remote') school.dayStatuses[day] = 'holiday';
+            else school.dayStatuses[day] = 'onsite';
+
+            saveDataToStorage();
+            renderSchoolTable(currentActiveSchoolId);
+        }
+
+        function handleAbsentFocus(input) {
+            if (input.value === '0') {
+                input.value = '';
+            }
+        }
+
+        function handleAbsentBlur(input) {
+            if (input.value.trim() === '') {
+                input.value = '0';
+                let event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        }
+
         function updateSchoolAbsent(schoolId, day, input) {
             let canEdit = checkWeekPermissions();
-            if(!canEdit) return; // منع التعديل تماماً إذا كان الحقل مقفلاً
+            if(!canEdit) return; 
             let school = schoolsData.find(s => s.id === schoolId);
             if(school) {
                 if(!school.absent) school.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
@@ -1061,18 +1165,17 @@
         }
 
         function updateClassName(input, schoolId, index) {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) return;
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') return;
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes[index]) {
                 school.classes[index].name = input.value.trim();
+                sortClassesProperly(school.classes);
                 saveDataToStorage();
             }
         }
 
         function updateClassStudents(input, schoolId, index) {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) return;
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') return;
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes[index]) {
                 school.classes[index].students = parseInt(input.value) || 0;
@@ -1082,8 +1185,7 @@
         }
 
         function addNewClassToSchool() {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل. لا يمكن الإضافة.'); return; }
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') { alert('⚠️ عذراً، إضافة الفصول مقتصرة على المسؤول العام فقط.'); return; }
             let nameInput = document.getElementById('newClassNameInput');
             let studInput = document.getElementById('newClassStudentsInput');
             if(!nameInput) return;
@@ -1094,15 +1196,17 @@
             let school = schoolsData.find(s => s.id === targetId);
             if(!school) { alert('⚠️ يرجى اختيار المدرسة أولاً.'); return; }
             if(!school.classes) school.classes = [];
+            
             school.classes.push({ name: cName, students: cStudents });
+            sortClassesProperly(school.classes);
+
             saveDataToStorage();
             nameInput.value = '';
             renderSchoolTable(school.id);
         }
 
         function deleteClassRow(schoolId, index) {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل. لا يمكن الحذف.'); return; }
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') { alert('⚠️ عذراً، حذف الفصول مقتصر على المسؤول العام فقط.'); return; }
             let school = schoolsData.find(s => s.id === schoolId);
             if(school && school.classes.length > 1) {
                 if(confirm('هل أنت متأكد من حذف هذا الفصل؟')) {
@@ -1113,18 +1217,6 @@
             } else {
                 alert('يجب أن يبقى فصل واحد على الأقل.');
             }
-        }
-
-        function toggleHoliday(day) {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
-            holidays[day] = !holidays[day];
-            let btn = document.getElementById(`btn${day.charAt(0).toUpperCase() + day.slice(1)}`);
-            if(btn) {
-                if(holidays[day]) { btn.classList.add('holiday'); btn.innerText = 'إجازة'; }
-                else { btn.classList.remove('holiday'); btn.innerText = 'دراسة'; }
-            }
-            if(currentActiveSchoolId) renderSchoolTable(currentActiveSchoolId);
         }
 
         function calculateStats() {
@@ -1143,16 +1235,26 @@
 
             dayKeys.forEach(key => {
                 let abs = school && school.absent ? (school.absent[key] || 0) : 0;
+                let status = school && school.dayStatuses ? (school.dayStatuses[key] || 'onsite') : 'onsite';
                 let sElem = document.getElementById(`stat_students_${key}`);
                 let pElem = document.getElementById(`stat_present_${key}`);
                 let aElem = document.getElementById(`stat_absent_${key}`);
                 let rElem = document.getElementById(`stat_rate_${key}`);
 
-                if(holidays[key]) {
+                if(status === 'holiday') {
                     if(sElem) sElem.innerText = '-';
                     if(pElem) pElem.innerText = '-';
                     if(aElem) aElem.innerText = '-';
                     if(rElem) rElem.innerText = 'إجازة (مستبعد)';
+                } else if(status === 'remote') {
+                    activeDays++;
+                    // في نظام عن بعد، يعتبر الجميع حاضرين (أو حسب رغبتكم، الغياب 0 أو مستبعد)
+                    let pres = totalStudents;
+                    let rate = '100.00 (عن بعد)';
+                    if(sElem) sElem.innerText = totalStudents;
+                    if(pElem) pElem.innerText = pres;
+                    if(aElem) aElem.innerText = '0';
+                    if(rElem) rElem.innerText = rate;
                 } else {
                     activeDays++;
                     cumAbsent += abs;
@@ -1228,18 +1330,28 @@
                     s.classes = [{name: 'أول/1', students: 25}];
                 }
                 if(!s.absent) s.absent = {sun:0, mon:0, tue:0, wed:0, thu:0};
+                if(!s.dayStatuses) s.dayStatuses = {sun:'onsite', mon:'onsite', tue:'onsite', wed:'onsite', thu:'onsite'};
 
                 let totalStudents = s.classes.reduce((acc, c) => acc + (parseInt(c.students) || 0), 0);
-                let absSun = s.absent.sun;
-                let absMon = s.absent.mon;
-                let absTue = s.absent.tue;
-                let absWed = s.absent.wed;
-                let absThu = s.absent.thu;
-                let totalAbsent = absSun + absMon + absTue + absWed + absThu;
-                let activeDaysCount = 5;
-                let possible = totalStudents * activeDaysCount;
+                
+                let dayKeys = ['sun', 'mon', 'tue', 'wed', 'thu'];
+                let totalAbsent = 0;
+                let activeDaysCount = 0;
+                let possible = 0;
+
+                dayKeys.forEach(dk => {
+                    let st = s.dayStatuses[dk] || 'onsite';
+                    if(st !== 'holiday') {
+                        activeDaysCount++;
+                        possible += totalStudents;
+                        if(st === 'onsite') {
+                            totalAbsent += (s.absent[dk] || 0);
+                        }
+                    }
+                });
+
                 let rate = possible > 0 ? (((possible - totalAbsent) / possible) * 100).toFixed(2) : '100.00';
-                return { ...s, totalStudents, absSun, absMon, absTue, absWed, absThu, totalAbsent, rate: parseFloat(rate) };
+                return { ...s, totalStudents, absSun: s.absent.sun, absMon: s.absent.mon, absTue: s.absent.tue, absWed: s.absent.wed, absThu: s.absent.thu, totalAbsent, rate: parseFloat(rate) };
             });
 
             ranked.sort((a, b) => b.rate - a.rate);
@@ -1305,8 +1417,7 @@
         }
 
         function exportEmptyTemplateExcel() {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') { alert('⚠️ عذراً، متاح للمسؤول العام فقط.'); return; }
             let data = [{ "اسم الفصل": "أول/1", "عدد الطلاب": 25 }, { "اسم الفصل": "ثاني/1", "عدد الطلاب": 25 }];
             let ws = XLSX.utils.json_to_sheet(data);
             let wb = XLSX.utils.book_new();
@@ -1315,8 +1426,7 @@
         }
 
         function importSchoolClassesFromExcel(e) {
-            let canEdit = checkWeekPermissions();
-            if(!canEdit) { alert('⚠️ وضع القراءة فقط مفعل.'); return; }
+            if(!currentUser || currentUser.role !== 'SUPER_ADMIN') { alert('⚠️ عذراً، استيراد الفصول مقتصر على المسؤول العام فقط.'); return; }
             let file = e.target.files[0];
             if(!file) return;
             let reader = new FileReader();
@@ -1325,7 +1435,7 @@
                     let data = new Uint8Array(event.target.result);
                     let workbook = XLSX.read(data, {type: 'array'});
                     let rows = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    let targetId = currentUser.role === 'SCHOOL' ? currentUser.schoolId : currentActiveSchoolId;
+                    let targetId = currentActiveSchoolId;
                     let school = schoolsData.find(s => s.id === targetId);
                     if(!school) { alert('⚠️ يرجى تحديد المدرسة أولاً.'); return; }
                     let newClasses = [];
@@ -1337,9 +1447,10 @@
                     if(newClasses.length > 0) {
                         if(!school.classes) school.classes = [];
                         school.classes = newClasses;
+                        sortClassesProperly(school.classes);
                         saveDataToStorage();
                         renderSchoolTable(school.id);
-                        alert(`✅ تم استيراد ${newClasses.length} فصول بنجاح.`);
+                        alert(`✅ تم استيراد وترتيب ${newClasses.length} فصول بنجاح.`);
                     }
                 } catch(err) { alert('⚠️ خطأ في قراءة ملف الإكسل.'); }
                 e.target.value = '';
